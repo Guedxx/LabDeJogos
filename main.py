@@ -100,61 +100,10 @@ def menu():
         
         janela.update()
 
-
-
 def play():
 
-    if dificuldade == 0:
-        SpeedNave = 275
-        DelayTiro = 0.5
-
-    
-
-    nave = GameImage("/home/guedes/Documents/VsCodeCodes/Python/Games/Space-Invaders/Sprites/nave.png")
-    nave.set_position(Screen_W / 2, Screen_H - nave.height - 10 )
-    while True:
-
-        #Pinta Janela
-        janela.set_background_color([0, 0, 0])
-
-
-        cooldown = DelayTiro
-        cooldown -= 0.1 * janela.delta_time()
-        tiros = []
-
-
-
-        if teclado.key_pressed("space") and cooldown <= 0:
-            tiro = Sprite("/home/guedes/Documents/VsCodeCodes/Python/Games/Space-Invaders/Sprites/tiro.png")
-            tiro.set_position(nave.x + 24, nave.y)
-            tiros.append(tiro)
-
-            cooldown = DelayTiro
-
+    print('nada')
         
-        for tiro in tiros:
-            tiro.draw()
-            tiro.x += 250 * janela.delta_time()
-
-            if tiro.x < 0:
-                del tiro
-
-
-
-        #Movimentação Nave
-        if teclado.key_pressed("D"):
-            nave.x += SpeedNave * janela.delta_time()
-        if teclado.key_pressed("A"):
-            nave.x -= SpeedNave * janela.delta_time()
-        if nave.x <= 0:
-            nave.x = 0 
-        if nave.x + nave.width >= Screen_W:
-            nave.x = Screen_W - nave.width
-
-        nave.draw()
-        janela.update()
-        
-
 
 def dificuldades():
     print("nada")
