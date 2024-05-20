@@ -2,6 +2,9 @@ from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.gameimage import *
 from PPlay.gameobject import *
+import os
+
+project_directory = os.path.dirname(__file__)
 
 # Janelas
 Screen_H, Screen_W = 720, 1280
@@ -21,10 +24,12 @@ dificuldade = 0
 #Telas Iniciais do Game
 def gameINIT():
     #Tela "A Game Lab Project"
-    tittleScreen_1 = GameImage("/home/guedes/Documents/VsCodeCodes/Python/Games/King Pong/Sprites/aGameLabProject.png")
+    image_path_GLP = os.path.join(project_directory, "Sprites", "aGameLabProject.png")
+    tittleScreen_1 = GameImage(image_path_GLP)
 
     #Tela "Made By"
-    tittleScreen_2 = GameImage("/home/guedes/Documents/VsCodeCodes/Python/Games/King Pong/Sprites/madeBy.png")
+    image_path_MB = os.path.join(project_directory, "Sprites", "madeBy.png")
+    tittleScreen_2 = GameImage(image_path_MB)
 
     while True:
 
@@ -47,10 +52,22 @@ def gameINIT():
 
 def menu():
 
-    Fundo = GameImage('/home/guedes/Documents/VsCodeCodes/Python/Games/King Pong/Sprites/menuScreen.png')
-    Menus = GameImage('/home/guedes/Documents/VsCodeCodes/Python/Games/King Pong/Sprites/menuSelector.png')
-    Indicador = GameImage('/home/guedes/Documents/VsCodeCodes/Python/Games/King Pong/Sprites/Indicador.png')
+    #Inicializa Imagens usadas no Menu
+
+    image_path_fundo = os.path.join(project_directory, "Sprites", "menuScreen.png")
+    Fundo = GameImage(image_path_fundo)
+
+    image_path_Menus = os.path.join(project_directory, "Sprites", "menuSelector.png")
+    Menus = GameImage(image_path_Menus)
+    
+    image_path_Indicador = os.path.join(project_directory, "Sprites", "Indicador.png")
+    Indicador = GameImage(image_path_Indicador)
+
+
+
     Started = False
+
+
     while True:
 
         while Started == False:
@@ -113,5 +130,5 @@ def ranking():
 
 
 
-
+print(os.getcwd())
 gameINIT()
