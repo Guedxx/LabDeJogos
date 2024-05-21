@@ -31,12 +31,10 @@ dificuldade = 0
 def gameINIT():
 
     #Tela "A Game Lab Project"
-    image_path_GLP = os.path.join(project_directory, "Sprites", "aGameLabProject.png")
-    tittleScreen_1 = GameImage(image_path_GLP)
+    tittleScreen_1 = GameImage(os.path.join(project_directory, "Sprites", "aGameLabProject.png"))
 
     #Tela "Made By"
-    image_path_MB = os.path.join(project_directory, "Sprites", "madeBy.png")
-    tittleScreen_2 = GameImage(image_path_MB)
+    tittleScreen_2 = GameImage(os.path.join(project_directory, "Sprites", "madeBy.png"))
 
     while True:
 
@@ -63,16 +61,13 @@ def menu():
     # Inicializa Imagens usadas no Menu
 
     # Imagem que aparece junto com o "Press Space to Begin"
-    image_path_fundo = os.path.join(project_directory, "Sprites", "menuScreen.png")
-    Fundo = GameImage(image_path_fundo)
+    Fundo = GameImage(os.path.join(project_directory, "Sprites", "menuScreen.png"))
 
     # Imagem conjunta do botão "Play", "Diff" e "Quit"
-    image_path_Menus = os.path.join(project_directory, "Sprites", "menuSelector.png")
-    Menus = GameImage(image_path_Menus)
+    Menus = GameImage(os.path.join(project_directory, "Sprites", "menuSelector.png"))
 
     # Imagem do pixel de seleção do menu principal
-    image_path_Indicador = os.path.join(project_directory, "Sprites", "Indicador.png")
-    Indicador = GameImage(image_path_Indicador)
+    Indicador = GameImage(os.path.join(project_directory, "Sprites", "Indicador.png"))
 
 
     #Variavel que confere se o jogador apertou espaço para entrar no menu
