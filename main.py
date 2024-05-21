@@ -70,25 +70,19 @@ def menu():
     Indicador = GameImage(os.path.join(project_directory, "Sprites", "Indicador.png"))
 
 
-    #Variavel que confere se o jogador apertou espaço para entrar no menu
-    Started = False
+    while True:     # Mini Loop que pede para o jogador apertar espaço
 
+        Fundo.draw()
+
+        janela.draw_text(text="- Press Space to Begin -", x= Screen_W/2 + 200,
+            y= Screen_H/2 + 100, size= 30, color=(255,255,255), font_name="Arial")
+        
+        if teclado.key_pressed("SPACE"):
+            break
+
+        janela.update()
 
     while True:
-
-        
-        while Started == False:     # Mini Loop que pede para o jogador apertar espaço
-
-            Fundo.draw()
-
-            janela.draw_text(text="- Press Space to Begin -", x= Screen_W/2 + 200,
-                              y= Screen_H/2 + 100, size= 30, color=(255,255,255), font_name="Arial")
-            
-            if teclado.key_pressed("SPACE"):
-                Started = True
-
-            janela.update()
-        
 
         #Começo do Loop do Menu 
         janela.set_background_color([0,0,0]) 
