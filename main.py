@@ -7,6 +7,7 @@ from PPlay.sprite import *
 from PPlay.gameimage import *
 from PPlay.gameobject import *
 import os
+from time import sleep
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
