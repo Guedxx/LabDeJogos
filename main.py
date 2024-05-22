@@ -7,6 +7,7 @@ from PPlay.sprite import *
 from PPlay.gameimage import *
 from PPlay.gameobject import *
 import os
+from time import sleep
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -30,12 +31,10 @@ dificuldade = 0
 def gameINIT():
 
     #Tela "A Game Lab Project"
-    image_path_GLP = os.path.join(project_directory, "Sprites", "aGameLabProject.png")
-    tittleScreen_1 = GameImage(image_path_GLP)
+    tittleScreen_1 = GameImage(os.path.join(project_directory, "Sprites", "aGameLabProject.png"))
 
     #Tela "Made By"
-    image_path_MB = os.path.join(project_directory, "Sprites", "madeBy.png")
-    tittleScreen_2 = GameImage(image_path_MB)
+    tittleScreen_2 = GameImage(os.path.join(project_directory, "Sprites", "madeBy.png"))
 
     while True:
 
@@ -62,37 +61,28 @@ def menu():
     # Inicializa Imagens usadas no Menu
 
     # Imagem que aparece junto com o "Press Space to Begin"
-    image_path_fundo = os.path.join(project_directory, "Sprites", "menuScreen.png")
-    Fundo = GameImage(image_path_fundo)
+    Fundo = GameImage(os.path.join(project_directory, "Sprites", "menuScreen.png"))
 
     # Imagem conjunta do botão "Play", "Diff" e "Quit"
-    image_path_Menus = os.path.join(project_directory, "Sprites", "menuSelector.png")
-    Menus = GameImage(image_path_Menus)
+    Menus = GameImage(os.path.join(project_directory, "Sprites", "menuSelector.png"))
 
     # Imagem do pixel de seleção do menu principal
-    image_path_Indicador = os.path.join(project_directory, "Sprites", "Indicador.png")
-    Indicador = GameImage(image_path_Indicador)
+    Indicador = GameImage(os.path.join(project_directory, "Sprites", "Indicador.png"))
 
 
-    #Variavel que confere se o jogador apertou espaço para entrar no menu
-    Started = False
+    while True:     # Mini Loop que pede para o jogador apertar espaço
 
+        Fundo.draw()
+
+        janela.draw_text(text="- Press Space to Begin -", x= Screen_W/2 + 200,
+            y= Screen_H/2 + 100, size= 30, color=(255,255,255), font_name="Arial")
+        
+        if teclado.key_pressed("SPACE"):
+            break
+
+        janela.update()
 
     while True:
-
-        
-        while Started == False:     # Mini Loop que pede para o jogador apertar espaço
-
-            Fundo.draw()
-
-            janela.draw_text(text="- Press Space to Begin -", x= Screen_W/2 + 200,
-                              y= Screen_H/2 + 100, size= 30, color=(255,255,255), font_name="Arial")
-            
-            if teclado.key_pressed("SPACE"):
-                Started = True
-
-            janela.update()
-        
 
         #Começo do Loop do Menu 
         janela.set_background_color([0,0,0]) 
