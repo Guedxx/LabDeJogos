@@ -6,8 +6,8 @@ from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.gameimage import *
 from PPlay.gameobject import *
+from PPlay.animation import *
 import os
-from time import sleep
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -116,15 +116,40 @@ def menu():
         janela.update()
 
 def play():
+    # Início da gameplay
+    backgnd = GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png"))
 
-    print('nada')
+    # Animação do player
+    player = Animation(os.path.join(project_directory, "Sprites", "SHEETMainChar.png"),18)
+    player.set_position(Screen_W - player.width,0)
+    player.set_sequence_time(0,17,200)
+    
+    # Animação da Tutoriana
+    tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETTutoriana.png"),18)
+    tutoriana.set_position(0,0)
+    tutoriana.set_sequence_time(0,17,200)
+
+    # Inicia as animações
+    player.play()
+    tutoriana.play()
+    
+    while True:
+        backgnd.draw()
+        player.draw()
+        tutoriana.draw()
+
+
+        player.update()
+        tutoriana.update()
+        janela.update()
+        
         
 
 def dificuldades():
-    print("nada")
+    raise NotImplementedError
 
 def ranking():
-    print("nada")
+    raise NotImplementedError
 
 
 
