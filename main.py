@@ -123,11 +123,15 @@ def play():
     player = Animation(os.path.join(project_directory, "Sprites", "SHEETMainChar.png"),18)
     player.set_position(Screen_W - player.width,0)
     player.set_sequence_time(0,17,200)
+    pad_player = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) # TODO Criar Sprite do PAD
+    pad_player.set_position(Screen_W - 20, Screen_H/2 - pad_player.height/2)
     
     # Animação da Tutoriana
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETTutoriana.png"),18)
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,17,200)
+    pad_tutoriana = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) # TODO Criar Sprite do PAD
+    pad_tutoriana.set_position(10, Screen_H/2 - pad_tutoriana.height/2)
 
     # Inicia as animações
     player.play()
@@ -136,7 +140,10 @@ def play():
     while True:
         backgnd.draw()
         player.draw()
+        pad_player.draw()
         tutoriana.draw()
+        pad_tutoriana.draw()
+
 
 
         player.update()
