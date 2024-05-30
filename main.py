@@ -138,11 +138,19 @@ def play():
     tutoriana.play()
     
     while True:
+        # Desenhar Sprites e GameImages
         backgnd.draw()
         player.draw()
         pad_player.draw()
         tutoriana.draw()
         pad_tutoriana.draw()
+
+        if teclado.key_pressed("up") and pad_player.y > player.height:
+            pad_player.y -= 100 * janela.delta_time()
+        elif teclado.key_pressed("down") and pad_player.y + pad_player.height < Screen_H:
+            pad_player.y += 100 * janela.delta_time()
+
+        
 
 
 
