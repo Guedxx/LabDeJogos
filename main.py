@@ -171,9 +171,10 @@ def play():
     DashReload = 300
     DashReloadPlayer = DashReload
     DashReloadEnemy = DashReload
-
     DashNumberPlayer = 3
     DashNumberEnemy = 3
+    FirstDashPlayer = False
+    FirstDashEnemy = False
 
     Momentum_player = 0
     MomentumDirection_player = 0
@@ -198,7 +199,8 @@ def play():
 
         #Contadores Dash
         DashCoolDownPlayer-= 1
-        DashReloadPlayer -= 1
+        if FirstDashPlayer == True:
+            DashReloadPlayer -= 1
 
         if DashReloadPlayer <= 0 and DashNumberPlayer < 3:
             DashNumberPlayer += 1
@@ -222,6 +224,7 @@ def play():
 
             #Da um Dash
             if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0: 
+                FirstDashPlayer = True
                 player_pad.y -= 2000* janela.delta_time()
                 player_dash.x += 80 #Move o contador de dashs para subtrair uma barrinha 
                 DashCoolDownPlayer = DashCoolDown
@@ -238,6 +241,7 @@ def play():
             MomentumDirection_player = -1
 
             if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0:
+                FirstDashPlayer = True
                 player_pad.y += 2000* janela.delta_time()
                 player_dash.x += 80 
                 DashCoolDownPlayer = DashCoolDown
