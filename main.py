@@ -201,6 +201,8 @@ def play():
         DashCoolDownPlayer-= 1
         if FirstDashPlayer == True:
             DashReloadPlayer -= 1
+        if DashNumberPlayer == 3:
+            FirstDashPlayer = False
 
         if DashReloadPlayer <= 0 and DashNumberPlayer < 3:
             DashNumberPlayer += 1
@@ -225,7 +227,8 @@ def play():
             #Da um Dash
             if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0: 
                 FirstDashPlayer = True
-                player_pad.y -= 2000* janela.delta_time()
+                player_pad.y -= (100 * janela.delta_time())
+                Momentum_player += 5000* janela.delta_time()
                 player_dash.x += 80 #Move o contador de dashs para subtrair uma barrinha 
                 DashCoolDownPlayer = DashCoolDown
                 DashNumberPlayer -= 1
@@ -242,7 +245,8 @@ def play():
 
             if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0:
                 FirstDashPlayer = True
-                player_pad.y += 2000* janela.delta_time()
+                player_pad.y += (1000 * janela.delta_time())
+                Momentum_player += 5000* janela.delta_time()
                 player_dash.x += 80 
                 DashCoolDownPlayer = DashCoolDown
                 DashNumberPlayer -= 1
@@ -267,6 +271,7 @@ def play():
             
 
         print(Momentum_player)
+
 
 
         #Update das Animations
