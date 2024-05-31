@@ -268,11 +268,6 @@ def play():
             MomentumDirection_player = 1 
             if Momentum_player < 100:
                 Momentum_player += Momentum_player * janela.delta_time()
-            
-
-        print(Momentum_player)
-
-
 
         #Update das Animations
         player.update()
@@ -289,3 +284,5 @@ def ranking():
 
 
 gameINIT()
+
+print("Fechou")
