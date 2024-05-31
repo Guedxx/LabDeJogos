@@ -18,7 +18,6 @@ Screen_H, Screen_W = 720, 1280
 janela = Window(Screen_W,Screen_H)
 janela.set_title('King Pong')
 
-
 # Mouse e Teclado
 mouse = Window.get_mouse()
 teclado = Window.get_keyboard()
@@ -27,17 +26,13 @@ teclado = Window.get_keyboard()
 dificuldade = 0
 
 
-
 #Telas Iniciais do Game
 def gameINIT():
 
     #Tela "A Game Lab Project"
     tittleScreen_1 = GameImage(os.path.join(project_directory, "Sprites", "INIT_aGameLabProject.png"))
-
     #Tela "Made By"
     tittleScreen_2 = GameImage(os.path.join(project_directory, "Sprites", "INIT_madeBy.png"))
-
-    
 
     while True:
 
@@ -55,7 +50,6 @@ def gameINIT():
             tittleScreen_2.draw()
             janela.update()
 
-        
         menu() #Inicia o Menu
 
 # Menu Principal
@@ -77,12 +71,10 @@ def menu():
     lil_man.set_sequence_time(0,1,1000)
     lil_man.play()
     
-
     #Musica que toca
     menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
     menu_music.play()
 
-    
 
 
     while True:     # Mini Loop que pede para o jogador apertar espaço
@@ -134,7 +126,6 @@ def menu():
 
 def play():
     
-
     # Início da gameplay
     backgnd = GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png"))
     hotbar = GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png"))
@@ -182,8 +173,10 @@ def play():
     DashReloadEnemy = DashReload
 
     DashNumberPlayer = 3
-    DashNumberEnemt = 3
+    DashNumberEnemy = 3
 
+    Momentum_player = 0
+    MomentumDirection_player = 0
 
     while True:
         # Desenhar Sprites e GameImages
@@ -200,7 +193,8 @@ def play():
         tutoriana_pad.draw()
         tutoriana.draw()
 
-        #Player Move-set
+
+        #Codigo referente ao player
 
         #Contadores Dash
         DashCoolDownPlayer-= 1
@@ -211,30 +205,58 @@ def play():
             DashReloadPlayer  = DashReload
             player_dash.x -= 80
 
-
+        #Momentum_player Calculations
+        if Momentum_player >= 0:
+            Momentum_player -= 75 * janela.delta_time()
+            if Momentum_player < 0:
+                Momentum_player = 0
+            
         #Movements
         if teclado.key_pressed("W"):
-            player_pad.y -= 200 * janela.delta_time()
-            if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0: #Da um Dash
+
+            player_pad.y -= (200 * janela.delta_time()) + (Momentum_player * janela.delta_time())
+
+            if Momentum_player < 100:
+                Momentum_player += 100 * janela.delta_time()
+            MomentumDirection_player = 1
+
+            #Da um Dash
+            if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0: 
                 player_pad.y -= 2000* janela.delta_time()
-                player_dash.x += 80                       #Move a barra de dashs para diminuir um 
+                player_dash.x += 80 #Move o contador de dashs para subtrair uma barrinha 
                 DashCoolDownPlayer = DashCoolDown
                 DashNumberPlayer -= 1
 
+
+        #Tudo que o de cima faz mas condireando a descida
         elif teclado.key_pressed("S"):
-            player_pad.y += 200 * janela.delta_time()
 
-            if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0: #Da um Dash
+            player_pad.y += (200 * janela.delta_time()) + Momentum_player * janela.delta_time()
+
+            if Momentum_player < 100:
+                Momentum_player += 100 * janela.delta_time()
+            MomentumDirection_player = -1
+
+            if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0:
                 player_pad.y += 2000* janela.delta_time()
-                player_dash.x += 80                     #Move a barra de dashs para diminuir um 
+                player_dash.x += 80 
                 DashCoolDownPlayer = DashCoolDown
                 DashNumberPlayer -= 1
+        
+        if MomentumDirection_player == 1:
+            player_pad.y -= Momentum_player * janela.delta_time()
+        elif MomentumDirection_player == -1:
+            player_pad.y += Momentum_player * janela.delta_time()
 
         #Colide Walls Check
-        if  player_pad.y < player.height:
-            player_pad.y = player.height
-        elif    player_pad.y + player_pad.height > Screen_H:
-            player_pad.y = Screen_H - player_pad.height
+        if player_pad.y < player.height:
+            player_pad.y = player.height + 2
+            MomentumDirection_player = -1
+        elif player_pad.y + player_pad.height > Screen_H:
+            player_pad.y = Screen_H - player_pad.height - 2
+            MomentumDirection_player = 1
+
+
 
 
         #Update das Animations
