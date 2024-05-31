@@ -37,6 +37,7 @@ def gameINIT():
     #Tela "Made By"
     tittleScreen_2 = GameImage(os.path.join(project_directory, "Sprites", "INIT_madeBy.png"))
 
+    
 
     while True:
 
@@ -62,7 +63,7 @@ def menu():
 
     # Inicializa Imagens usadas no Menu
     # Imagem que aparece junto com o "Press Space to Begin"
-    Fundo = GameImage(os.path.join(project_directory, "Sprites", "INIT_menuScreen.png"))
+    Fundo = GameImage(os.path.join(project_directory, "Sprites", "MENU_menuInitScreen.png"))
 
     # Imagem conjunta do botão "Play", "Diff" e "Quit"
     Menus = GameImage(os.path.join(project_directory, "Sprites", "MENU_menuSelector.png"))
@@ -70,22 +71,29 @@ def menu():
     # Imagem do pixel de seleção do menu principal
     Indicador = GameImage(os.path.join(project_directory, "Sprites", "MENU_Indicador.png"))
 
+    #Bonequinho Animado :D
+    lil_man = Animation((os.path.join(project_directory, "Sprites", "MENU_Char.png")), 2)
+    lil_man.set_position(220, 420)
+    lil_man.set_sequence_time(0,1,1000)
+    lil_man.play()
+    
+
     #Musica que toca
     menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
     menu_music.play()
-    menu_music.set_repeat(repeat=True)
+
+    
 
 
     while True:     # Mini Loop que pede para o jogador apertar espaço
-
-        Fundo.draw()
-
-        janela.draw_text(text="- Press Space to Begin -", x= Screen_W/2 + 200,
-            y= Screen_H/2 + 100, size= 30, color=(255,255,255), font_name="Arial")
         
         if teclado.key_pressed("SPACE"):
             break
 
+        Fundo.draw()
+        lil_man.draw()
+
+        lil_man.update()
         janela.update()
 
     while True:
