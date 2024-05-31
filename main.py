@@ -168,7 +168,7 @@ def play():
     DashCoolDownPlayer = DashCoolDown
     DashCoolDownEnemy = DashCoolDown
 
-    DashReload = 300
+    DashReload = 600
     DashReloadPlayer = DashReload
     DashReloadEnemy = DashReload
     DashNumberPlayer = 3
@@ -214,6 +214,11 @@ def play():
             Momentum_player -= 75 * janela.delta_time()
             if Momentum_player < 0:
                 Momentum_player = 0
+
+        if MomentumDirection_player == 1:
+            player_pad.y -= Momentum_player * janela.delta_time()
+        elif MomentumDirection_player == -1:
+            player_pad.y += Momentum_player * janela.delta_time()
             
         #Movements
         if teclado.key_pressed("W"):
@@ -251,10 +256,6 @@ def play():
                 DashCoolDownPlayer = DashCoolDown
                 DashNumberPlayer -= 1
         
-        if MomentumDirection_player == 1:
-            player_pad.y -= Momentum_player * janela.delta_time()
-        elif MomentumDirection_player == -1:
-            player_pad.y += Momentum_player * janela.delta_time()
 
         #Colide Walls Check
         if player_pad.y < player.height:
