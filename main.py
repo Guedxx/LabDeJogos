@@ -39,6 +39,8 @@ def gameINIT():
         #CountDown da priemira tela
         time = 15
         while time > 0:
+            if teclado.key_pressed("SPACE"):
+                break
             time -= 10 * janela.delta_time()
             tittleScreen_1.draw()
             janela.update()
@@ -46,6 +48,8 @@ def gameINIT():
         #CountDown da segunda tela
         time = 15
         while time > 0:
+            if teclado.key_pressed("SPACE"):
+                break
             time -= 10 * janela.delta_time()
             tittleScreen_2.draw()
             janela.update()
@@ -160,6 +164,10 @@ def play():
     tutoriana_dash= Sprite(os.path.join(project_directory, "Sprites", "DASHBAR.png"))
     tutoriana_dash.set_position(160, 90)
 
+    # Sprite da Orb
+    Orb = Sprite(os.path.join(project_directory, "Sprites", "SHEETORB.png"), 8)
+    Orb.set_position(Screen_W/2, (Screen_H  )/2)
+
     # Inicia as animações
     player.play()
     tutoriana.play()
@@ -183,6 +191,7 @@ def play():
         # Desenhar Sprites e GameImages
         backgnd.draw()
         hotbar.draw()
+        Orb.draw()
 
         player_hearts.draw()
         player_dash.draw()
