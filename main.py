@@ -109,12 +109,14 @@ def menu():
             Indicador.set_position(400, 300)
             Indicador.draw()
             if mouse.is_button_pressed(1):
+                menu_music.pause()
                 play()
                 
         if mouse.is_over_area([455, 380], [760, 440]):          #Botão de Dificuldades
             Indicador.set_position(400, 400)
             Indicador.draw()
             if mouse.is_button_pressed(1):
+                menu_music.pause()
                 dificuldades()
                 
         if mouse.is_over_area([455, 480], [760, 540]):          #Botão de Sair
@@ -122,6 +124,7 @@ def menu():
             Indicador.draw()
 
             if mouse.is_button_pressed(1):
+                menu_music.pause()
                 janela.close()
 
 
@@ -130,6 +133,8 @@ def menu():
         janela.update()
 
 def play():
+    
+
     # Início da gameplay
     backgnd = GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png"))
     hotbar = GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png"))
@@ -194,7 +199,6 @@ def play():
         tutoriana_dash.draw()
         tutoriana_pad.draw()
         tutoriana.draw()
-
 
         #Player Move-set
 
