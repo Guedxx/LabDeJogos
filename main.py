@@ -168,6 +168,10 @@ def play():
     Orb = Sprite(os.path.join(project_directory, "Sprites", "SHEETORB.png"), 8)
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
 
+    # Velocidade da orb
+    velx = 100
+    vely = 100
+
     # Inicia as animações
     player.play()
     tutoriana.play()
@@ -202,6 +206,20 @@ def play():
         tutoriana_dash.draw()
         tutoriana_pad.draw()
         tutoriana.draw()
+
+        # Código da Orb
+        if Orb.x > Screen_W - Orb.width or Orb.x < 0:
+            # Ponto para Tutoriana
+            # -1 coração para o player
+            velx *= -1
+        if Orb.y > Screen_H - Orb.height or Orb.y < tutoriana.height:
+            vely *= -1
+        
+        if Orb.collided(player_pad) or Orb.collided(tutoriana_pad):
+            velx *= -1
+        
+        Orb.x += velx * janela.delta_time()
+        Orb.y += vely * janela.delta_time()
 
 
         #Codigo referente ao player
