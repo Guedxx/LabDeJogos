@@ -7,6 +7,7 @@ from PPlay.sprite import *
 from PPlay.gameimage import *
 from PPlay.gameobject import *
 from PPlay.animation import *
+from PPlay.sound import *
 import os
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
@@ -36,9 +37,10 @@ def gameINIT():
     #Tela "Made By"
     tittleScreen_2 = GameImage(os.path.join(project_directory, "Sprites", "INIT_madeBy.png"))
 
+
     while True:
 
-        #LCountDown da priemira tela
+        #CountDown da priemira tela
         time = 15
         while time > 0:
             time -= 10 * janela.delta_time()
@@ -53,13 +55,12 @@ def gameINIT():
             janela.update()
 
         
-        menu()                          #Inicia o Menu
+        menu() #Inicia o Menu
 
 # Menu Principal
 def menu():
 
     # Inicializa Imagens usadas no Menu
-
     # Imagem que aparece junto com o "Press Space to Begin"
     Fundo = GameImage(os.path.join(project_directory, "Sprites", "INIT_menuScreen.png"))
 
@@ -68,6 +69,11 @@ def menu():
 
     # Imagem do pixel de seleção do menu principal
     Indicador = GameImage(os.path.join(project_directory, "Sprites", "MENU_Indicador.png"))
+
+    #Musica que toca
+    menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
+    menu_music.play()
+    menu_music.set_repeat(repeat=True)
 
 
     while True:     # Mini Loop que pede para o jogador apertar espaço
@@ -118,42 +124,108 @@ def menu():
 def play():
     # Início da gameplay
     backgnd = GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png"))
+    hotbar = GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png"))
+    
 
     # Animação do player
     player = Animation(os.path.join(project_directory, "Sprites", "SHEETMainChar.png"),18)
     player.set_position(Screen_W - player.width,0)
-    player.set_sequence_time(0,17,200)
-    pad_player = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) # TODO Criar Sprite do PAD
-    pad_player.set_position(Screen_W - 20, Screen_H/2 - pad_player.height/2)
+    player.set_sequence_time(0,18,100)
+
+    player_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Player.png")) # TODO Criar Sprite do PAD
+    player_pad.set_position(Screen_W -  player_pad.width - 10, Screen_H/2 - player_pad.height/2)
+
+    player_hearts = Sprite(os.path.join(project_directory, "Sprites", "HEARTS.png"))
+    player_hearts.set_position(890, 20)
+
+    player_dash = Sprite(os.path.join(project_directory, "Sprites", "DASHBAR.png"))
+    player_dash .set_position(890, 90)
+
     
     # Animação da Tutoriana
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETTutoriana.png"),18)
     tutoriana.set_position(0,0)
-    tutoriana.set_sequence_time(0,17,200)
-    pad_tutoriana = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) # TODO Criar Sprite do PAD
-    pad_tutoriana.set_position(10, Screen_H/2 - pad_tutoriana.height/2)
+    tutoriana.set_sequence_time(0,18,100)
+
+    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) # TODO Criar Sprite do PAD
+    tutoriana_pad .set_position(10, Screen_H/2 - tutoriana_pad.height/2)
+
+    tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
+    tutoriana_hearts.set_position(160, 20)
+
+    tutoriana_dash= Sprite(os.path.join(project_directory, "Sprites", "DASHBAR.png"))
+    tutoriana_dash.set_position(160, 90)
 
     # Inicia as animações
     player.play()
     tutoriana.play()
     
+    DashCoolDown = 30
+    DashCoolDownPlayer = DashCoolDown
+    DashCoolDownEnemy = DashCoolDown
+
+    DashReload = 300
+    DashReloadPlayer = DashReload
+    DashReloadEnemy = DashReload
+
+    DashNumberPlayer = 3
+    DashNumberEnemt = 3
+
+
     while True:
         # Desenhar Sprites e GameImages
         backgnd.draw()
+        hotbar.draw()
+
+        player_hearts.draw()
+        player_dash.draw()
+        player_pad.draw()
         player.draw()
-        pad_player.draw()
+
+        tutoriana_hearts.draw()
+        tutoriana_dash.draw()
+        tutoriana_pad.draw()
         tutoriana.draw()
-        pad_tutoriana.draw()
-
-        if teclado.key_pressed("up") and pad_player.y > player.height:
-            pad_player.y -= 100 * janela.delta_time()
-        elif teclado.key_pressed("down") and pad_player.y + pad_player.height < Screen_H:
-            pad_player.y += 100 * janela.delta_time()
-
-        
 
 
+        #Player Move-set
 
+        #Contadores Dash
+        DashCoolDownPlayer-= 1
+        DashReloadPlayer -= 1
+
+        if DashReloadPlayer <= 0 and DashNumberPlayer < 3:
+            DashNumberPlayer += 1
+            DashReloadPlayer  = DashReload
+            player_dash.x -= 80
+
+
+        #Movements
+        if teclado.key_pressed("W"):
+            player_pad.y -= 200 * janela.delta_time()
+            if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0: #Da um Dash
+                player_pad.y -= 2000* janela.delta_time()
+                player_dash.x += 80                       #Move a barra de dashs para diminuir um 
+                DashCoolDownPlayer = DashCoolDown
+                DashNumberPlayer -= 1
+
+        elif teclado.key_pressed("S"):
+            player_pad.y += 200 * janela.delta_time()
+
+            if teclado.key_pressed("SPACE") and DashCoolDownPlayer < 0 and DashNumberPlayer > 0: #Da um Dash
+                player_pad.y += 2000* janela.delta_time()
+                player_dash.x += 80                     #Move a barra de dashs para diminuir um 
+                DashCoolDownPlayer = DashCoolDown
+                DashNumberPlayer -= 1
+
+        #Colide Walls Check
+        if  player_pad.y < player.height:
+            player_pad.y = player.height
+        elif    player_pad.y + player_pad.height > Screen_H:
+            player_pad.y = Screen_H - player_pad.height
+
+
+        #Update das Animations
         player.update()
         tutoriana.update()
         janela.update()
@@ -167,6 +239,4 @@ def ranking():
     raise NotImplementedError
 
 
-
-print(os.getcwd())
 gameINIT()
