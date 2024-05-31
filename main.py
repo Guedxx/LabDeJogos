@@ -218,7 +218,7 @@ def play():
 
             player_pad.y -= (200 * janela.delta_time()) + (Momentum_player * janela.delta_time())
 
-            if Momentum_player < 100:
+            if Momentum_player < 100 and player_pad.y > player.height:
                 Momentum_player += 100 * janela.delta_time()
             MomentumDirection_player = 1
 
@@ -236,7 +236,7 @@ def play():
 
             player_pad.y += (200 * janela.delta_time()) + Momentum_player * janela.delta_time()
 
-            if Momentum_player < 100:
+            if Momentum_player < 100  and player_pad.y + player_pad.height < Screen_H :
                 Momentum_player += 100 * janela.delta_time()
             MomentumDirection_player = -1
 
@@ -254,13 +254,19 @@ def play():
 
         #Colide Walls Check
         if player_pad.y < player.height:
-            player_pad.y = player.height + 2
+            player_pad.y = player.height 
             MomentumDirection_player = -1
+            if Momentum_player < 100:
+                Momentum_player += Momentum_player * janela.delta_time()
+
         elif player_pad.y + player_pad.height > Screen_H:
-            player_pad.y = Screen_H - player_pad.height - 2
-            MomentumDirection_player = 1
+            player_pad.y = Screen_H - player_pad.height
+            MomentumDirection_player = 1 
+            if Momentum_player < 100:
+                Momentum_player += Momentum_player * janela.delta_time()
+            
 
-
+        print(Momentum_player)
 
 
         #Update das Animations
