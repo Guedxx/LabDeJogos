@@ -165,17 +165,22 @@ def play():
     tutoriana_dash.set_position(160, 90)
 
     # Sprite da Orb
-    Orb = Sprite(os.path.join(project_directory, "Sprites", "SHEETORB.png"), 8)
+    Orb = Animation(os.path.join(project_directory, "Sprites", "SHEETORB.png"), 8)
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
+    Orb.set_sequence_time(0,8,100)
 
     # Velocidade da orb
-    velx = 100
-    vely = 100
+    velx_base = 100
+    vely_base = 100
+    velx = velx_base
+    vely = vely_base
 
     # Inicia as animações
     player.play()
     tutoriana.play()
+    Orb.play()
     
+    #Infos Dashs
     DashCoolDown = 30
     DashCoolDownPlayer = DashCoolDown
     DashCoolDownEnemy = DashCoolDown
@@ -208,18 +213,43 @@ def play():
         tutoriana.draw()
 
         # Código da Orb
-        if Orb.x > Screen_W - Orb.width or Orb.x < 0:
+        if Orb.x > Screen_W - Orb.width:
             # Ponto para Tutoriana
             # -1 coração para o player
             velx *= -1
-        if Orb.y > Screen_H - Orb.height or Orb.y < tutoriana.height:
+            Orb.x = Screen_W - Orb.width
+            player_hearts.x += 80
+            velx = velx_base
+
+        if Orb.x < 0:
+            #Ponto Player
+            #-1 coração para Tutoriana
+            velx *= -1
+            Orb.x = 0
+
+        if Orb.y > Screen_H - Orb.height:
+            Orb.y = Screen_H - Orb.height
+            vely *= -1
+        if Orb.y < tutoriana.height:
+            Orb.y = tutoriana.height
             vely *= -1
         
-        if Orb.collided(player_pad) or Orb.collided(tutoriana_pad):
-            velx *= -1
+        if Orb.collided(player_pad):
+            if Orb.y + Orb.height == player_pad.y or Orb.y == player_pad.y + player_pad.height:
+                vely *= -1
+
+            if Orb.x + Orb.width >= player_pad.x:
+                Orb.x = player_pad.x - Orb.width
+                velx *= -1 
         
         Orb.x += velx * janela.delta_time()
         Orb.y += vely * janela.delta_time()
+
+
+        if velx > 0:
+            velx += 25 * janela.delta_time()
+        else:
+            velx -= 25* janela.delta_time()
 
 
         #Codigo referente ao player
@@ -297,7 +327,11 @@ def play():
             if Momentum_player < 100:
                 Momentum_player += Momentum_player * janela.delta_time()
 
+
+        #IA Tutoriana        
+
         #Update das Animations
+        Orb.update()
         player.update()
         tutoriana.update()
         janela.update()
