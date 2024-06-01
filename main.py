@@ -341,10 +341,23 @@ def play():
 
         #IA Tutoriana  v0.0
 
+        #Momentum Tutoriana Calculations
+        if Momentum_enemy >= 0:
+            Momentum_enemy -= 75 * janela.delta_time()
+            if Momentum_enemy < 0:
+                Momentum_enemy = 0
+
+        if MomentumDirection_enemy == 1:
+            tutoriana_pad.y -= Momentum_enemy * janela.delta_time()
+        elif MomentumDirection_enemy == -1:
+            tutoriana_pad.y += Momentum_enemy * janela.delta_time()
+
         #Sobe em relaçâo ao orb
         if tutoriana_pad.y + tutoriana_pad.height/2 < Orb.y + Orb.height /2:
 
             tutoriana_pad.y += (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
+
+            MomentumDirection_enemy = -1
 
             if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
                 Momentum_enemy += 100 * janela.delta_time()
@@ -354,6 +367,8 @@ def play():
         if tutoriana_pad.y + tutoriana_pad.height/2 > Orb.y + Orb.height /2:
 
             tutoriana_pad.y -= (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
+
+            MomentumDirection_enemy= 1
 
             if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
                 Momentum_enemy += 100 * janela.delta_time()
