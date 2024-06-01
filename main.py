@@ -141,7 +141,7 @@ def play():
     player.set_sequence_time(0,18,100)
 
     player_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Player.png")) # TODO Criar Sprite do PAD
-    player_pad.set_position(Screen_W -  player_pad.width - 10, Screen_H/2 - player_pad.height/2)
+    player_pad.set_position(Screen_W -  player_pad.width - 10, ((Screen_H  + player.height)/2) - player_pad.height/2)
 
     player_hearts = Sprite(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     player_hearts.set_position(890, 20)
@@ -156,7 +156,7 @@ def play():
     tutoriana.set_sequence_time(0,18,100)
 
     tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) # TODO Criar Sprite do PAD
-    tutoriana_pad .set_position(10, Screen_H/2 - tutoriana_pad.height/2)
+    tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
 
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     tutoriana_hearts.set_position(160, 20)
@@ -373,7 +373,7 @@ def play():
 
             if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
                 Momentum_enemy += 100 * janela.delta_time()
-                MomentumDirection_enemy = 1
+                
 
         #Desce em relaçâo ao orb
         if tutoriana_pad.y + tutoriana_pad.height/2 > Orb.y + Orb.height /2 and velx < 0:
@@ -384,7 +384,6 @@ def play():
 
             if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
                 Momentum_enemy += 100 * janela.delta_time()
-                MomentumDirection_enemy = 1
         
         #Colide Walls
         if tutoriana_pad.y < player.height:
