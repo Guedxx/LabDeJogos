@@ -1,7 +1,6 @@
 # O seguinte código apresenta o corpo principal do jogo "King Pong"
 # feito para o projeto de Laboratório de Jogos.
 
-
 from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.gameimage import *
@@ -9,6 +8,7 @@ from PPlay.gameobject import *
 from PPlay.animation import *
 from PPlay.sound import *
 import os
+import random
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -195,6 +195,8 @@ def play():
 
     Momentum_player = 0
     MomentumDirection_player = 0
+    Momentum_enemy = 0
+    MomentumDirection_enemy = 0
 
     while True:
         # Desenhar Sprites e GameImages
@@ -328,7 +330,39 @@ def play():
                 Momentum_player += Momentum_player * janela.delta_time()
 
 
-        #IA Tutoriana        
+
+        #IA Tutoriana  v0.0
+
+        #Sobe em relaçâo ao orb
+        if tutoriana_pad.y + tutoriana_pad.height/2 < Orb.y + Orb.height /2:
+
+            tutoriana_pad.y += (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
+
+            if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
+                Momentum_enemy += 100 * janela.delta_time()
+                MomentumDirection_enemy = 1
+
+        #Desce em relaçâo ao orb
+        if tutoriana_pad.y + tutoriana_pad.height/2 > Orb.y + Orb.height /2:
+
+            tutoriana_pad.y -= (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
+
+            if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
+                Momentum_enemy += 100 * janela.delta_time()
+                MomentumDirection_enemy = 1
+        
+        #Colide Walls
+
+        if tutoriana_pad.y < player.height:
+            tutoriana_pad.y = player.height
+        if tutoriana_pad.y + tutoriana_pad.height > Screen_H:
+            tutoriana_pad.y = Screen_H - tutoriana_pad.height
+
+
+
+
+
+
 
         #Update das Animations
         Orb.update()
