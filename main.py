@@ -244,6 +244,14 @@ def play():
                 Orb.x = player_pad.x - Orb.width
                 velx *= -1 
         
+        if Orb.collided(tutoriana_pad):
+            if Orb.y == tutoriana_pad.y + tutoriana_pad.height or Orb.y + Orb.height == tutoriana_pad.y:
+                vely *= -1
+
+            if Orb.x  <= tutoriana_pad.x + tutoriana_pad.width:
+                Orb.x = tutoriana_pad.x + tutoriana_pad.width
+                velx *= -1 
+        
         Orb.x += velx * janela.delta_time()
         Orb.y += vely * janela.delta_time()
 
