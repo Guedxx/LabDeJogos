@@ -215,27 +215,28 @@ def play():
         tutoriana.draw()
 
         # Código da Orb
-        if Orb.x > Screen_W - Orb.width:
-            # Ponto para Tutoriana
-            # -1 coração para o player
+
+        #Colisão Paredes 
+        if Orb.x >= Screen_W - Orb.width: # Ponto para Tutoriana
             velx *= -1
             Orb.x = Screen_W - Orb.width
-            player_hearts.x += 80
+            player_hearts.x += 80 # -1 coração para o player
             velx = velx_base
 
-        if Orb.x < 0:
-            #Ponto Player
-            #-1 coração para Tutoriana
+        if Orb.x <= 0: #Ponto Player
             velx *= -1
             Orb.x = 0
+            tutoriana_pad.x -= 80 #-1 coração para Tutoriana
+            velx = velx_base
 
-        if Orb.y > Screen_H - Orb.height:
+        if Orb.y >= Screen_H - Orb.height: #Parede de Baixo
             Orb.y = Screen_H - Orb.height
             vely *= -1
-        if Orb.y < tutoriana.height:
+        if Orb.y <= tutoriana.height: #Parede de Cima
             Orb.y = tutoriana.height
             vely *= -1
         
+        #Colisão Pads
         if Orb.collided(player_pad):
             if Orb.y + Orb.height == player_pad.y or Orb.y == player_pad.y + player_pad.height:
                 vely *= -1
@@ -252,17 +253,18 @@ def play():
                 Orb.x = tutoriana_pad.x + tutoriana_pad.width
                 velx *= -1 
         
+        #Movimentação
         Orb.x += velx * janela.delta_time()
         Orb.y += vely * janela.delta_time()
 
-
+        #Aumento de velocidades
         if velx > 0:
-            velx += 25 * janela.delta_time()
+            velx += 10 * janela.delta_time()
         else:
-            velx -= 25* janela.delta_time()
+            velx -= 10 * janela.delta_time()
 
 
-        #Codigo referente ao player
+        #Codigo referente ao player --------
 
         #Contadores Dash
         DashCoolDownPlayer-= 1
@@ -368,14 +370,13 @@ def play():
 
             tutoriana_pad.y -= (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
 
-            MomentumDirection_enemy= 1
+            MomentumDirection_enemy = 1
 
             if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
                 Momentum_enemy += 100 * janela.delta_time()
                 MomentumDirection_enemy = 1
         
         #Colide Walls
-
         if tutoriana_pad.y < player.height:
             tutoriana_pad.y = player.height
         if tutoriana_pad.y + tutoriana_pad.height > Screen_H:
