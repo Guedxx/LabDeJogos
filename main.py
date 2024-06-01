@@ -262,6 +262,11 @@ def play():
             velx += 10 * janela.delta_time()
         else:
             velx -= 10 * janela.delta_time()
+        
+        if vely > 0:
+            vely += 5 * janela.delta_time()
+        else:
+            vely -= 5 * janela.delta_time()
 
 
         #Codigo referente ao player --------
