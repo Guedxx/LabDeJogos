@@ -140,7 +140,7 @@ def play():
     player.set_position(Screen_W - player.width,0)
     player.set_sequence_time(0,18,100)
 
-    player_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Player.png")) # TODO Criar Sprite do PAD
+    player_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Player.png"))
     player_pad.set_position(Screen_W -  player_pad.width - 10, ((Screen_H  + player.height)/2) - player_pad.height/2)
 
     player_hearts = Sprite(os.path.join(project_directory, "Sprites", "HEARTS.png"))
@@ -155,7 +155,7 @@ def play():
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,18,100)
 
-    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) # TODO Criar Sprite do PAD
+    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
 
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
@@ -167,7 +167,9 @@ def play():
     # Sprite da Orb
     Orb = Animation(os.path.join(project_directory, "Sprites", "SHEETORB.png"), 8)
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
-    Orb.set_sequence_time(0,8,100)
+    vel_animation = 100
+    Orb.set_sequence_time(0,8, vel_animation)
+    
 
     # Velocidade da orb
     velx_base = 100
@@ -246,8 +248,6 @@ def play():
             elif abs(Orb.y - (player_pad.y + player_pad.height)) < 10 and vely < 0:
                 vely *= -1 
 
-
-
         if Orb.collided(tutoriana_pad):
             if abs(Orb.x - (tutoriana_pad.x + tutoriana_pad.width)) < 10:
                 velx *= -1
@@ -257,7 +257,6 @@ def play():
             elif abs(Orb.y - (tutoriana_pad.y + tutoriana_pad.height)) < 10 and vely < 0:
                 vely *= -1 
             
-        
         #Movimentação
         Orb.x += velx * janela.delta_time()
         Orb.y += vely * janela.delta_time()
@@ -273,6 +272,8 @@ def play():
         else:
             vely -= 5 * janela.delta_time()
 
+        vel_animation -= 200 * janela.delta_time()
+        Orb.set_total_duration(vel_animation)
 
         #Codigo referente ao player --------
 
@@ -391,12 +392,6 @@ def play():
         if tutoriana_pad.y + tutoriana_pad.height > Screen_H:
             tutoriana_pad.y = Screen_H - tutoriana_pad.height
 
-
-
-
-
-
-
         #Update das Animations
         Orb.update()
         player.update()
@@ -404,7 +399,6 @@ def play():
         janela.update()
         
         
-
 def dificuldades():
     raise NotImplementedError
 
