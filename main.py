@@ -255,8 +255,10 @@ def play():
                 Orb.x = player_pad.x - Orb.width
             elif abs(Orb.y + Orb.height - player_pad.y) < 10 and vely > 0:
                 vely *= -1 
+                Orb.y = player_pad.y - Orb.height
             elif abs(Orb.y - (player_pad.y + player_pad.height)) < 10 and vely < 0:
                 vely *= -1 
+                Orb.y = player_pad.y + player_pad.height
 
         if Orb.collided(tutoriana_pad):
             sound_hit_pad.play()
@@ -265,8 +267,10 @@ def play():
                 Orb.x = tutoriana_pad.x + tutoriana_pad.width
             elif abs(Orb.y + Orb.height - tutoriana_pad.y) < 10 and vely > 0:
                 vely *= -1 
+                Orb.y = tutoriana_pad.y - Orb.height
             elif abs(Orb.y - (tutoriana_pad.y + tutoriana_pad.height)) < 10 and vely < 0:
                 vely *= -1 
+                Orb.y = tutoriana_pad.y + tutoriana_pad.height
             
         #Movimentação
         Orb.x += velx * janela.delta_time()
@@ -278,9 +282,9 @@ def play():
         else:
             velx -= 10 * janela.delta_time()
         
-        if vely > 0:
+        if  600 > vely > 0:
             vely += 5 * janela.delta_time()
-        else:
+        elif 600 < vely < 0:
             vely -= 5 * janela.delta_time()
 
         print(velx)
