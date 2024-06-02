@@ -228,15 +228,15 @@ def play():
             sound_damage.play()
             Orb.x = Screen_W - Orb.width - 2
             player_hearts.x += 80 # -1 coração para o player
-            velx /= 2
-            vely /= 2
+            velx = -(velx/2)
+            vely = (vely/2)
 
         if Orb.x <= 0: #Ponto Player
             sound_damage.play()
             Orb.x = 2
             tutoriana_hearts.x -= 80 # -1 coração para Tutoriana 
-            velx /= 2
-            vely /= 2
+            velx = -(velx/2)
+            vely = (vely/2)
 
         if Orb.y >= Screen_H - Orb.height: #Parede de Baixo
             sound_hit_wall.play()
@@ -250,25 +250,25 @@ def play():
         #Colisão Pads
         if Orb.collided(player_pad):
             sound_hit_pad.play()
-            if abs(Orb.x + Orb.width - player_pad.x) < 10:
+            if abs(Orb.x + Orb.width - player_pad.x) < 20:
                 velx *= -1
                 Orb.x = player_pad.x - Orb.width
-            elif abs(Orb.y + Orb.height - player_pad.y) < 10 and vely > 0:
+            elif abs(Orb.y + Orb.height - player_pad.y) < 20 and vely > 0:
                 vely *= -1 
                 Orb.y = player_pad.y - Orb.height
-            elif abs(Orb.y - (player_pad.y + player_pad.height)) < 10 and vely < 0:
+            elif abs(Orb.y - (player_pad.y + player_pad.height)) < 20 and vely < 0:
                 vely *= -1 
                 Orb.y = player_pad.y + player_pad.height
 
         if Orb.collided(tutoriana_pad):
             sound_hit_pad.play()
-            if abs(Orb.x - (tutoriana_pad.x + tutoriana_pad.width)) < 10:
+            if abs(Orb.x - (tutoriana_pad.x + tutoriana_pad.width)) < 20:
                 velx *= -1
                 Orb.x = tutoriana_pad.x + tutoriana_pad.width
-            elif abs(Orb.y + Orb.height - tutoriana_pad.y) < 10 and vely > 0:
+            elif abs(Orb.y + Orb.height - tutoriana_pad.y) < 20 and vely > 0:
                 vely *= -1 
                 Orb.y = tutoriana_pad.y - Orb.height
-            elif abs(Orb.y - (tutoriana_pad.y + tutoriana_pad.height)) < 10 and vely < 0:
+            elif abs(Orb.y - (tutoriana_pad.y + tutoriana_pad.height)) < 20 and vely < 0:
                 vely *= -1 
                 Orb.y = tutoriana_pad.y + tutoriana_pad.height
             
@@ -277,17 +277,16 @@ def play():
         Orb.y += vely * janela.delta_time()
 
         #Aumento de velocidades
-        if velx > 0:
+        if  550 > velx > 0:
             velx += 10 * janela.delta_time()
-        else:
+        elif 550 < velx < 0:
             velx -= 10 * janela.delta_time()
         
-        if  600 > vely > 0:
+        if  550 > vely > 0:
             vely += 5 * janela.delta_time()
-        elif 600 < vely < 0:
+        elif 550 < vely < 0:
             vely -= 5 * janela.delta_time()
 
-        print(velx)
 
         #vel_animation -= 200 * janela.delta_time()
         #Orb.set_total_duration(vel_animation)
