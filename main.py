@@ -283,8 +283,10 @@ def play():
         else:
             vely -= 5 * janela.delta_time()
 
-        vel_animation -= 200 * janela.delta_time()
-        Orb.set_total_duration(vel_animation)
+        print(velx)
+
+        #vel_animation -= 200 * janela.delta_time()
+        #Orb.set_total_duration(vel_animation)
 
         #Codigo referente ao player --------
 
