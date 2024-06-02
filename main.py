@@ -134,6 +134,11 @@ def play():
     backgnd = GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png"))
     hotbar = GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png"))
     
+    #Sons Usados
+    sound_damage = Sound(os.path.join(project_directory, "Sounds", "hit_sound.ogg"))
+    sound_hit_pad = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
+    sound_hit_wall = Sound(os.path.join(project_directory, "Sounds", "wall_sound.ogg"))
+
 
     # Animação do player
     player = Animation(os.path.join(project_directory, "Sprites", "SHEETMainChar.png"),18)
@@ -220,26 +225,31 @@ def play():
 
         #Colisão Paredes 
         if Orb.x + Orb.width >= Screen_W: # Ponto para Tutoriana
+            sound_damage.play()
             Orb.x = Screen_W - Orb.width - 2
             player_hearts.x += 80 # -1 coração para o player
-            velx = -velx_base
-            vely = -vely_base
+            velx /= 2
+            vely /= 2
 
         if Orb.x <= 0: #Ponto Player
+            sound_damage.play()
             Orb.x = 2
             tutoriana_hearts.x -= 80 # -1 coração para Tutoriana 
-            velx = velx_base
-            vely = vely_base
+            velx /= 2
+            vely /= 2
 
         if Orb.y >= Screen_H - Orb.height: #Parede de Baixo
+            sound_hit_wall.play()
             Orb.y = Screen_H - Orb.height
             vely *= -1
         if Orb.y <= tutoriana.height: #Parede de Cima
+            sound_hit_wall.play() 
             Orb.y = tutoriana.height
             vely *= -1
         
         #Colisão Pads
         if Orb.collided(player_pad):
+            sound_hit_pad.play()
             if abs(Orb.x + Orb.width - player_pad.x) < 10:
                 velx *= -1
                 Orb.x = player_pad.x - Orb.width
@@ -249,6 +259,7 @@ def play():
                 vely *= -1 
 
         if Orb.collided(tutoriana_pad):
+            sound_hit_pad.play()
             if abs(Orb.x - (tutoriana_pad.x + tutoriana_pad.width)) < 10:
                 velx *= -1
                 Orb.x = tutoriana_pad.x + tutoriana_pad.width
