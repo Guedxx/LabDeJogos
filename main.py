@@ -10,6 +10,7 @@ from PPlay.sound import *
 import os
 import random
 from setup import *
+from ingame import *
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -412,10 +413,7 @@ def play():
             tutoriana_pad.y = Screen_H - tutoriana_pad.height
 
         #Update das Animations
-        Orb.update()
-        player.update()
-        tutoriana.update()
-        janela.update()
+        updateAll(janela, Orb, tutoriana, player)
         
 
 def ranking():
