@@ -161,7 +161,6 @@ def menu():
                 menu_music.pause()
                 janela.close()
         
-        print(dificuldade_menu)
 
         side_bar.draw()
         janela.update()
