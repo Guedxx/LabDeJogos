@@ -24,149 +24,6 @@ janela.set_title('King Pong')
 mouse = Window.get_mouse()
 teclado = Window.get_keyboard()
 
-
-#Telas Iniciais do Game
-def gameINIT():
-
-    #Tela "A Game Lab Project"
-    tittleScreen_1 = GameImage(os.path.join(project_directory, "Sprites", "INIT_aGameLabProject.png"))
-    #Tela "Made By"
-    tittleScreen_2 = GameImage(os.path.join(project_directory, "Sprites", "INIT_madeBy.png"))
-
-    while True:
-
-        #CountDown da priemira tela
-        time = 15
-        while time > 0:
-            time -= 10 * janela.delta_time()
-            tittleScreen_1.draw()
-            janela.update()
-
-        #CountDown da segunda tela
-        time = 15
-        while time > 0:
-
-            time -= 10 * janela.delta_time()
-            tittleScreen_2.draw()
-            janela.update()
-
-        menu() #Inicia o Menu
-
-# Menu Principal
-def menu():
-
-    dificuldade_menu = 0
-    cooldown_dificuldade = 0
-
-    # Inicializa Imagens usadas no Menu
-    # Imagem que aparece junto com o "Press Space to Begin"
-    Fundo_INIT = GameImage(os.path.join(project_directory, "Sprites", "MENU_menuInitScreen.png"))
-
-    #Fundos
-    Fundo_EASY = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_easy.png"),4)
-    Fundo_EASY.set_sequence_time(0,2,975)
-    Fundo_EASY.play()
-    Fundo_NORMAL = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_normal.png"),4)
-    Fundo_NORMAL.set_sequence_time(0,2,765)
-    Fundo_NORMAL.play()
-    Fundo_HARD = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_hard.png"),4)
-    Fundo_HARD.set_sequence_time(0,2,500)
-    Fundo_HARD.play()
-
-    # Imagem conjunta do botão "Play", "Diff" e "Quit" que entra na animação
-    side_bar_normal = GameImage(os.path.join(project_directory, "Sprites", "MENU_side_normal.png"))
-    side_bar_normal.set_position(-780, 0)
-
-    # Imagem do pixel de seleção do menu principal
-    Indicador = GameImage(os.path.join(project_directory, "Sprites", "MENU_Indicador.png"))
-
-    #Bonequinho Animado :D
-    lil_man = Animation((os.path.join(project_directory, "Sprites", "MENU_Char.png")), 4)
-    lil_man.set_position(220, 420)
-    lil_man.set_sequence_time(0,2,200)
-    lil_man.play()
-    
-    #Musica que toca
-    menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
-    menu_music.play()
-
-    #Sons Menu
-        #Mouse hover area TODO
-        #Mouse Click TODO
-
-    # Mini Loop que pede para o jogador apertar espaço
-    while True:     
-        
-        if teclado.key_pressed("SPACE"):
-            break
-
-        janela.set_background_color([0,0,0])
-        Fundo_INIT.draw()
-        lil_man.draw()
-        lil_man.update()
-        janela.update()
-
-    while True:
-
-        #Animação que traz o menu pelo lado
-        desacelerador = 0
-        while side_bar_normal.x < 0:
-            desacelerador += 40 * janela.delta_time()
-            side_bar_normal.x += (700 - desacelerador) * janela.delta_time()
-            side_bar_normal.draw()
-            janela.update()
-
-
-        #Começo do Loop do Menu 
-        janela.set_background_color([0,0,0]) 
-
-        if dificuldade_menu == -1: #Dificuldade easy
-            Fundo_EASY.draw()
-            Fundo_EASY.update()
-            side_bar = GameImage(os.path.join(project_directory, "Sprites", "MENU_side_easy.png"))
-        if dificuldade_menu == 0: #Dificuldade normal
-            Fundo_NORMAL.draw()
-            Fundo_NORMAL.update()
-            side_bar = GameImage(os.path.join(project_directory, "Sprites", "MENU_side_normal.png"))
-        if dificuldade_menu == 1: #Dificuldade hard
-            Fundo_HARD.draw()
-            Fundo_HARD.update()
-            side_bar = GameImage(os.path.join(project_directory, "Sprites", "MENU_side_hard.png"))
-        
-            
-
-        #As seguintes linhas são em relação aos clicks do mouse 
-                
-        if mouse.is_over_area([95, 380], [250, 412]):          #Botão de Play
-            
-            if mouse.is_button_pressed(1):
-                menu_music.pause()
-                play()
-                
-        cooldown_dificuldade -= 60 * janela.delta_time()
-        if mouse.is_over_area([95, 470], [280, 500]):          #Botão de Dificuldades
-            
-            if mouse.is_button_pressed(1) and cooldown_dificuldade <= 0:
-                if dificuldade_menu < 1:
-                    dificuldade_menu += 1
-                elif dificuldade_menu == 1:
-                    dificuldade_menu = -1
-                cooldown_dificuldade = 30
-                
-                
-                
-        if mouse.is_over_area([95, 550], [222, 577]):          #Botão de Sair
-            Indicador.set_position(400, 500)
-            Indicador.draw()
-
-            if mouse.is_button_pressed(1):
-                menu_music.pause()
-                janela.close()
-        
-
-        side_bar.draw()
-        janela.update()
-
 def play():
     
     # Início da gameplay
@@ -414,12 +271,13 @@ def play():
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
-        
+
 
 def ranking():
     raise NotImplementedError
 
 
-gameINIT()
+if gameINIT(project_directory, janela):
+    play()
 
 print("Fechou")
