@@ -1,5 +1,12 @@
-# O seguinte código apresenta o corpo principal do jogo "King Pong"
-# feito para o projeto de Laboratório de Jogos.
+"""
+O seguinte código apresenta o corpo principal do jogo "King Pong"
+Feito para o projeto de Laboratório de Jogos no semestre 2024.1 do curso de ciência da computação UFF Niterói
+Autores: Rafael de Lima Pereira (Github: @RafaelLime) e Pedro Guedes Guimarães (Github: @Guedxx)
+Data da produção: 05/04/2024 - 12/07/2024
+
+
+
+"""
 
 from PPlay.window import *
 from PPlay.sprite import *
@@ -62,19 +69,8 @@ def play():
 
     while True:
         # Desenhar Sprites e GameImages
-        backgnd.draw()
-        hotbar.draw()
-        Orb.draw()
+        drawAll(backgnd, hotbar, Orb, player_hearts, player_dash, player_pad, player, tutoriana_hearts, tutoriana_dash, tutoriana_pad, tutoriana)
 
-        player_hearts.draw()
-        player_dash.draw()
-        player_pad.draw()
-        player.draw()
-
-        tutoriana_hearts.draw()
-        tutoriana_dash.draw()
-        tutoriana_pad.draw()
-        tutoriana.draw()
 
         # Código da Orb
 
@@ -272,12 +268,5 @@ def play():
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
 
-
-def ranking():
-    raise NotImplementedError
-
-
 if gameINIT(project_directory, janela):
     play()
-
-print("Fechou")

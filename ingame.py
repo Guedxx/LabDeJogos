@@ -2,8 +2,10 @@ from PPlay.window import *
 from PPlay.animation import *
 
 
-def updateAll(janela, orb, p1, p2):
-    orb.update()
-    p1.update()
-    p2.update()
-    janela.update()
+def updateAll(*args):
+    for i in args:
+        i.update()
+
+def drawAll(*args):
+    for i in args:
+        i.draw()
