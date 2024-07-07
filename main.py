@@ -275,7 +275,7 @@ def play():
             tutoriana_pad.y += Momentum_enemy * janela.delta_time()
 
         #Sobe em relaçâo ao orb
-        if tutoriana_pad.y + tutoriana_pad.height/2 < Orb.y + Orb.height /2 and velx < 0:
+        if tutoriana_pad.y + tutoriana_pad.height/2 < Orb.y + Orb.height /2 and velx < 0 and Orb.x < Screen_W/2:
 
             tutoriana_pad.y += (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
 
@@ -286,7 +286,7 @@ def play():
                 
 
         #Desce em relaçâo ao orb
-        if tutoriana_pad.y + tutoriana_pad.height/2 > Orb.y + Orb.height /2 and velx < 0:
+        if tutoriana_pad.y + tutoriana_pad.height/2 > Orb.y + Orb.height /2 and velx < 0 and Orb.x < Screen_W/2:
 
             tutoriana_pad.y -= (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
 
