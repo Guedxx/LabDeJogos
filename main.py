@@ -170,10 +170,6 @@ def play():
     # Início da gameplay
     backgnd = GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png"))
     hotbar = GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png"))
-   
-    sound_hit_wall = Sound(os.path.join(project_directory, "Sounds", "wall_sound.ogg"))
-    sound_hit_pad = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
-    sound_damage = Sound(os.path.join(project_directory, "Sounds", "hit_sound.ogg"))
 
     # Animação do player
     player = Animation(os.path.join(project_directory, "Sprites", "SHEETMainChar.png"),18)
