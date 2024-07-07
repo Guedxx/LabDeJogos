@@ -18,6 +18,7 @@ import os
 import random
 from setup import *
 from ingame import *
+from animations import *
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -32,6 +33,9 @@ mouse = Window.get_mouse()
 teclado = Window.get_keyboard()
 
 def play():
+
+    #Numero da Fase
+    fase = 0
     
     # Início da gameplay
     backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF1(project_directory, Screen_W, Screen_H)
@@ -66,6 +70,10 @@ def play():
     Momentum_enemy = 0
     MomentumDirection_enemy = 0
 
+    #Vidas
+    vida_player = 3
+    vida_tutoriana = 3
+
     while True:
         # Desenhar Sprites e GameImages
         drawAll(backgnd, hotbar, Orb, player_hearts, player_dash, player_pad, player, tutoriana_hearts, tutoriana_dash, tutoriana_pad, tutoriana)
@@ -75,7 +83,8 @@ def play():
 
         
 
-
+        if teclado.key_pressed("E"):
+            passou_fase(project_directory,janela,fase)
 
 
         # Código da Orb
@@ -86,6 +95,7 @@ def play():
             sound_hit.play()
             Orb.x = Screen_W - Orb.width - 2
             player_hearts.x += 80 # -1 coração para o player
+            vida_player -= 1
             velx = -(velx/2)
             vely = (vely/2)
 
@@ -94,6 +104,12 @@ def play():
             sound_hit.play()
             Orb.x = 2
             tutoriana_hearts.x -= 80 # -1 coração para Tutoriana 
+            vida_tutoriana -= 1
+
+            if vida_tutoriana == 0:
+                passou_fase(project_directory,janela,fase)
+
+
             velx = -(velx/2)
             vely = (vely/2)
 
