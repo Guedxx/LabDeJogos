@@ -75,7 +75,7 @@ def menu(project_directory, janela, teclado, mouse):
 
     #Sons Menu
         #Mouse hover area TODO
-        #Mouse Click TODO
+        #Mouse Click
 
     # Mini Loop que pede para o jogador apertar espaço
     while True:     
@@ -88,6 +88,12 @@ def menu(project_directory, janela, teclado, mouse):
         lil_man.draw()
         lil_man.update()
         janela.update()
+
+        #Loop musica
+        if menu_music.is_playing() == False:
+            menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
+            menu_music.play()
+
 
     while True:
 
@@ -102,6 +108,11 @@ def menu(project_directory, janela, teclado, mouse):
 
         #Começo do Loop do Menu 
         janela.set_background_color([0,0,0]) 
+
+        #Loop musica menu
+        if menu_music.is_playing() == False:
+            menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
+            menu_music.play()
 
         if dificuldade_menu == -1: #Dificuldade easy
             Fundo_EASY.draw()
@@ -123,6 +134,8 @@ def menu(project_directory, janela, teclado, mouse):
         if mouse.is_over_area([95, 380], [250, 412]):          #Botão de Play
             
             if mouse.is_button_pressed(1):
+                mouse_click = Sound(os.path.join(project_directory, "Sounds", "MENUSelect.ogg"))
+                mouse_click.play()
                 menu_music.pause()
                 return 1
                 
@@ -130,6 +143,8 @@ def menu(project_directory, janela, teclado, mouse):
         if mouse.is_over_area([95, 470], [280, 500]):          #Botão de Dificuldades
             
             if mouse.is_button_pressed(1) and cooldown_dificuldade <= 0:
+                mouse_click = Sound(os.path.join(project_directory, "Sounds", "MENUSelect.ogg"))
+                mouse_click.play()
                 if dificuldade_menu < 1:
                     dificuldade_menu += 1
                 elif dificuldade_menu == 1:
@@ -143,6 +158,8 @@ def menu(project_directory, janela, teclado, mouse):
             Indicador.draw()
 
             if mouse.is_button_pressed(1):
+    
+                mouse_click.play()
                 menu_music.pause()
                 janela.close()
         
@@ -160,17 +177,17 @@ def setupF1(project_directory, Screen_W, Screen_H):
     player_hearts.set_position(890, 20)
     player_dash = Sprite(os.path.join(project_directory, "Sprites", "DASHBAR.png"))
     player_dash .set_position(890, 90)
+
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETTutoriana.png"),18)
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,18,100)
     tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
-
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     tutoriana_hearts.set_position(160, 20)
-
     tutoriana_dash= Sprite(os.path.join(project_directory, "Sprites", "DASHBAR.png"))
     tutoriana_dash.set_position(160, 90)
+
     Orb = Animation(os.path.join(project_directory, "Sprites", "SHEETORB.png"), 8)
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
     vel_animation = 100

@@ -71,6 +71,13 @@ def play():
         drawAll(backgnd, hotbar, Orb, player_hearts, player_dash, player_pad, player, tutoriana_hearts, tutoriana_dash, tutoriana_pad, tutoriana)
 
 
+        #Codigos referentes ao tutorial
+
+        
+
+
+
+
         # Código da Orb
 
         #Colisão Paredes 
