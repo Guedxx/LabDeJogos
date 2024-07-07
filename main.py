@@ -38,8 +38,8 @@ def play():
     
 
     # Velocidade da orb
-    velx_base = 100
-    vely_base = 100
+    velx_base = 250
+    vely_base = 250
     velx = velx_base
     vely = vely_base
 
@@ -67,6 +67,10 @@ def play():
     Momentum_enemy = 0
     MomentumDirection_enemy = 0
 
+    ## HP
+    enemy_hp = 3
+    player_hp = 3
+
     while True:
         # Desenhar Sprites e GameImages
         drawAll(backgnd, hotbar, Orb, player_hearts, player_dash, player_pad, player, tutoriana_hearts, tutoriana_dash, tutoriana_pad, tutoriana)
@@ -79,6 +83,11 @@ def play():
             sound_hit = Sound(os.path.join(project_directory, "Sounds", "hit_sound.ogg"))
             sound_hit.play()
             Orb.x = Screen_W - Orb.width - 2
+            player_hp -= 1
+            if player_hp == 0:
+                # Game Over
+                # Cai para o início da torre
+                return 0
             player_hearts.x += 80 # -1 coração para o player
             velx = -(velx/2)
             vely = (vely/2)
@@ -87,6 +96,11 @@ def play():
             sound_hit = Sound(os.path.join(project_directory, "Sounds", "hit_sound.ogg"))
             sound_hit.play()
             Orb.x = 2
+            enemy_hp -= 1
+            if enemy_hp == 0:
+                # Próxima fase
+                # Animação subindo torre
+                return 1
             tutoriana_hearts.x -= 80 # -1 coração para Tutoriana 
             velx = -(velx/2)
             vely = (vely/2)
@@ -241,7 +255,7 @@ def play():
         #Sobe em relaçâo ao orb
         if tutoriana_pad.y + tutoriana_pad.height/2 < Orb.y + Orb.height /2 and velx < 0:
 
-            tutoriana_pad.y += (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
+            tutoriana_pad.y += (100 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
 
             MomentumDirection_enemy = -1
 
@@ -252,7 +266,7 @@ def play():
         #Desce em relaçâo ao orb
         if tutoriana_pad.y + tutoriana_pad.height/2 > Orb.y + Orb.height /2 and velx < 0:
 
-            tutoriana_pad.y -= (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
+            tutoriana_pad.y -= (100 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
 
             MomentumDirection_enemy = 1
 
@@ -269,4 +283,15 @@ def play():
         updateAll(janela, Orb, tutoriana, player)
 
 if gameINIT(project_directory, janela):
+    # Fase 1 - Tutoriana
     play()
+    # Fase 2
+    play()
+    #Fase 3
+    play()
+    # Fase 4
+    play()
+    # Fase 5
+    play()
+
+    # You're the King Pong!

@@ -8,7 +8,7 @@ from PPlay.mouse import *
 import os
 
 
-def gameINIT(project_directory, janela):
+def gameINIT(project_directory:str, janela:Window) -> int:
 
     #Tela "A Game Lab Project"
     tittleScreen_1, tittleScreen_2 = GameImage(os.path.join(project_directory, "Sprites", "INIT_aGameLabProject.png")), GameImage(os.path.join(project_directory, "Sprites", "INIT_madeBy.png"))
@@ -36,7 +36,7 @@ def gameINIT(project_directory, janela):
         return 1
 
 # Menu do jogo
-def menu(project_directory, janela, teclado, mouse):
+def menu(project_directory:str, janela:Window, teclado:Keyboard, mouse:Mouse) -> int:
 
     dificuldade_menu = 0
     cooldown_dificuldade = 0
@@ -150,7 +150,7 @@ def menu(project_directory, janela, teclado, mouse):
         side_bar.draw()
         janela.update()
 
-def setupF1(project_directory, Screen_W, Screen_H):
+def setupF1(project_directory:str, Screen_W:int, Screen_H:int):
     player = Animation(os.path.join(project_directory, "Sprites", "SHEETMainChar.png"),18)
     player.set_position(Screen_W - player.width,0)
     player.set_sequence_time(0,18,100)
