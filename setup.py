@@ -42,18 +42,17 @@ def menu(project_directory, janela, teclado, mouse):
     cooldown_dificuldade = 0
 
     # Inicializa Imagens usadas no Menu
-    # Imagem que aparece junto com o "Press Space to Begin"
-    Fundo_INIT = GameImage(os.path.join(project_directory, "Sprites", "MENU_menuInitScreen.png"))
+    Logo = Fundo_EASY = GameImage(os.path.join(project_directory, "Sprites", "INIT_LOGO.png"))
 
     #Fundos
-    Fundo_EASY = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_easy.png"),4)
-    Fundo_EASY.set_sequence_time(0,2,975)
+    Fundo_EASY = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_easy.png"),3)
+    Fundo_EASY.set_sequence_time(0,3,975)
     Fundo_EASY.play()
-    Fundo_NORMAL = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_normal.png"),4)
-    Fundo_NORMAL.set_sequence_time(0,2,765)
+    Fundo_NORMAL = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_normal.png"),3)
+    Fundo_NORMAL.set_sequence_time(0,3,765)
     Fundo_NORMAL.play()
-    Fundo_HARD = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_hard.png"),4)
-    Fundo_HARD.set_sequence_time(0,2,500)
+    Fundo_HARD = Animation(os.path.join(project_directory, "Sprites", "MENU_bg_hard.png"),3)
+    Fundo_HARD.set_sequence_time(0,3,500)
     Fundo_HARD.play()
 
     # Imagem conjunta do botão "Play", "Diff" e "Quit" que entra na animação
@@ -65,7 +64,7 @@ def menu(project_directory, janela, teclado, mouse):
 
     #Bonequinho Animado :D
     lil_man = Animation((os.path.join(project_directory, "Sprites", "MENU_Char.png")), 4)
-    lil_man.set_position(220, 420)
+    lil_man.set_position(220, 445)
     lil_man.set_sequence_time(0,2,200)
     lil_man.play()
     
@@ -84,7 +83,10 @@ def menu(project_directory, janela, teclado, mouse):
             break
 
         janela.set_background_color([0,0,0])
-        Fundo_INIT.draw()
+        
+        Fundo_NORMAL.draw()
+        Fundo_NORMAL.update()
+        Logo.draw()
         lil_man.draw()
         lil_man.update()
         janela.update()
