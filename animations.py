@@ -16,6 +16,8 @@ def passou_fase(project_directory,janela, N_Fase):
     Torre = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONTower.png"))
     PlayerHead = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONPlayerHead.png"))
     Enemy_Felled = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONEnemyFelled.png"),3)
+    Fundo = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONEnemyFelled.png"),3)
+    Fundo.set_sequence_time(1,1,50000)
     Enemy_Felled.set_sequence_time(0,2,500)
     Enemy_Felled.play()
 
@@ -70,8 +72,71 @@ def passou_fase(project_directory,janela, N_Fase):
             Torre.y += (10 + aceleration) *janela.delta_time()
         
 
-
+        Fundo.draw()
         Torre.draw()
         PlayerHead.draw()
         janela.update()
         
+        
+def game_over(project_directory,janela):
+    
+    Torre = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOver.png"))
+    FallMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverChar.png"), 8)
+    FallMan.set_sequence_time(0,8,200)
+    FallMan.set_position(750, 100)
+    
+    SleepyMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverEepy.png"), 6)
+    SleepyMan.set_sequence_time(0,6,300)
+    SleepyMan.set_position(540, 550)
+    
+    
+    #Animation
+    fallAcel = 1200
+    fallAceltorre = 800
+    jogadaAcel = 400
+    while True:
+
+        SleepyMan.hide()
+        
+        #Desce a imagem de fundo
+        if(Torre.y >= -720):
+            Torre.y -= fallAceltorre * janela.delta_time()
+            fallAceltorre += 100 * janela.delta_time()
+
+        #Joga boneco para o lado 
+        if(FallMan.x >= 540):
+            FallMan.x -= (200 + jogadaAcel)* janela.delta_time()
+        
+        #Cuida da aceleraçao do boneco quando a torre para de descer
+        if(Torre.y <= -720 and FallMan.y < 585):
+            FallMan.y += fallAcel * janela.delta_time()
+            fallAcel += 400 * janela.delta_time()    
+            
+        if (Torre.y <= -720 and FallMan.y >= 585):
+            FallMan.y += fallAcel * janela.delta_time()
+            
+            if FallMan.y > 585:
+                FallMan.hide()
+                SleepyMan.unhide()
+                FallMan.y = 590
+                fallAcel *= -1
+                fallAcel /= 2
+                fallAcel += 20
+            else:
+                FallMan.unhide()
+                SleepyMan.hide()
+                
+
+            
+    
+            
+    
+        
+        Torre.draw()
+        FallMan.draw()
+        FallMan.update()
+        SleepyMan.draw()
+        SleepyMan.update()
+        janela.update()
+    
+    

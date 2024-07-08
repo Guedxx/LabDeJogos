@@ -85,6 +85,9 @@ def play():
 
         if teclado.key_pressed("E"):
             passou_fase(project_directory,janela,fase)
+        
+        if teclado.key_pressed("F"):
+            game_over(project_directory,janela)
 
 
         # Código da Orb
