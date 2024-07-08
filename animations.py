@@ -76,7 +76,9 @@ def passou_fase(project_directory,janela, N_Fase):
         Torre.draw()
         PlayerHead.draw()
         janela.update()
-        
+    
+
+    
         
 def game_over(project_directory,janela):
     
