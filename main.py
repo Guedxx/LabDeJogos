@@ -19,7 +19,7 @@ import random
 from setup import *
 from ingame import *
 from animations import *
-from pause import *
+from gamefunctions import *
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
