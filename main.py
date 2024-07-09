@@ -19,6 +19,7 @@ import random
 from setup import *
 from ingame import *
 from animations import *
+from pause import *
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -85,9 +86,12 @@ def play():
 
         if teclado.key_pressed("E"):
             passou_fase(project_directory,janela,fase)
-        
+         
         if teclado.key_pressed("F"):
             game_over(project_directory,janela)
+        
+        if teclado.key_pressed("ESC"):
+            pause(project_directory,janela, teclado, mouse)
 
 
         # Código da Orb
