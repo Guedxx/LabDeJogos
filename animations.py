@@ -10,7 +10,7 @@ from setup import *
 from ingame import *
 
 
-def passou_fase(project_directory,janela, N_Fase):
+def passou_fase(project_directory:str,janela:Window, N_Fase:int) -> None:
 
     
     Torre = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONTower.png"))
@@ -62,7 +62,8 @@ def passou_fase(project_directory,janela, N_Fase):
 
 
     aceleration = 100
-    while True:
+    time = 30
+    while time > 0:
 
         if aceleration >= 0:
             aceleration -= 10 * janela.delta_time()
@@ -70,12 +71,13 @@ def passou_fase(project_directory,janela, N_Fase):
             PlayerHead.y -= (10 + aceleration)* janela.delta_time()
         if Torre.y < nivel_a_chegar_torre:
             Torre.y += (10 + aceleration) *janela.delta_time()
-        
+        time -= 10*janela.delta_time()
 
         Fundo.draw()
         Torre.draw()
         PlayerHead.draw()
         janela.update()
+    return
     
 
     
