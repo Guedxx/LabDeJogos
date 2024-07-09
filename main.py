@@ -90,8 +90,7 @@ def play():
         if teclado.key_pressed("F"):
             game_over(project_directory,janela)
         
-        if teclado.key_pressed("ESC"):
-            pause(project_directory,janela, teclado, mouse)
+
 
 
         # Código da Orb
