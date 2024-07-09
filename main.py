@@ -97,7 +97,7 @@ def play(fase:int) -> int:
             return 1
         
         if teclado.key_pressed("F"):
-            game_over(project_directory,janela)
+            game_over(project_directory,janela, teclado, mouse)
             return 0
 
         if teclado.key_pressed("ESC"):
