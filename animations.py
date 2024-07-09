@@ -80,8 +80,6 @@ def passou_fase(project_directory:str,janela:Window, N_Fase:int) -> None:
     return
     
 
-    
-        
 def game_over(project_directory,janela):
     
     Torre = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOver.png"))
@@ -92,7 +90,16 @@ def game_over(project_directory,janela):
     
     SleepyMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverEepy.png"), 6)
     SleepyMan.set_sequence_time(0,6,300)
-    SleepyMan.set_position(540, 576)
+    SleepyMan.set_position(540, 575)
+    SleepyMan.hide()
+    
+    
+    GameOver = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverText.png"))
+    Yes = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverTextYes.png"))
+    No =  GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverTextNo.png"))
+    
+    explosion = Sound(os.path.join(project_directory, "Sounds", "ANIMATIONexplosion.ogg"))
+    explosion.play()
     
     
     #Animation
@@ -101,8 +108,14 @@ def game_over(project_directory,janela):
     fallAceltorre = 800
     jogadaAcel = 400
     while True:
-
-        SleepyMan.hide()
+        
+        
+        
+        Torre.draw()
+        FallMan.draw()
+        FallMan.update()
+        SleepyMan.draw()
+        
         
         #Desce a imagem de fundo
         if(Torre.y >= -765):
@@ -151,18 +164,9 @@ def game_over(project_directory,janela):
         #Parou de quicar
         if contador_quicadas >= 5:
             SleepyMan.unhide()
+            GameOver.draw()
         
-                
 
-            
-    
-            
-    
-        
-        Torre.draw()
-        FallMan.draw()
-        FallMan.update()
-        SleepyMan.draw()
         SleepyMan.update()
         janela.update()
     
