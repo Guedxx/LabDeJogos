@@ -85,16 +85,18 @@ def passou_fase(project_directory:str,janela:Window, N_Fase:int) -> None:
 def game_over(project_directory,janela):
     
     Torre = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOver.png"))
+    Torre.set_position(5,0)
     FallMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverChar.png"), 8)
-    FallMan.set_sequence_time(0,8,200)
+    FallMan.set_sequence_time(0,8,50)
     FallMan.set_position(750, 100)
     
     SleepyMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverEepy.png"), 6)
     SleepyMan.set_sequence_time(0,6,300)
-    SleepyMan.set_position(540, 550)
+    SleepyMan.set_position(540, 576)
     
     
     #Animation
+    contador_quicadas = 0
     fallAcel = 1200
     fallAceltorre = 800
     jogadaAcel = 400
@@ -103,32 +105,53 @@ def game_over(project_directory,janela):
         SleepyMan.hide()
         
         #Desce a imagem de fundo
-        if(Torre.y >= -720):
+        if(Torre.y >= -765):
             Torre.y -= fallAceltorre * janela.delta_time()
             fallAceltorre += 100 * janela.delta_time()
 
         #Joga boneco para o lado 
         if(FallMan.x >= 540):
             FallMan.x -= (200 + jogadaAcel)* janela.delta_time()
+            jogadaAcel -= 100 * janela.delta_time()
         
         #Cuida da aceleraçao do boneco quando a torre para de descer
-        if(Torre.y <= -720 and FallMan.y < 585):
+        if(Torre.y <= -765 and FallMan.y < 570):
             FallMan.y += fallAcel * janela.delta_time()
             fallAcel += 400 * janela.delta_time()    
             
-        if (Torre.y <= -720 and FallMan.y >= 585):
+        if Torre.y <= -765 and FallMan.y >= 570 and contador_quicadas <= 5:
             FallMan.y += fallAcel * janela.delta_time()
             
-            if FallMan.y > 585:
+            if FallMan.y > 570: #Bateu no chão
+                
+                hitSound = Sound(os.path.join(project_directory, "Sounds", "ANIMATIONHurt.ogg"))
+                hitSound.play()
+                
+                TempX = FallMan.x
+                TempY = FallMan.y
+                
+                FallMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverChar.png"), 8)
+                FallMan.set_sequence_time(0,8,50 * contador_quicadas)
+                FallMan.set_position(TempX, TempY)
+                
+                contador_quicadas += 1
+                
                 FallMan.hide()
                 SleepyMan.unhide()
-                FallMan.y = 590
+                FallMan.y = 570
                 fallAcel *= -1
                 fallAcel /= 2
                 fallAcel += 20
+                   
             else:
                 FallMan.unhide()
                 SleepyMan.hide()
+        
+                 
+        #Parou de quicar
+        if contador_quicadas >= 5:
+            SleepyMan.unhide()
+        
                 
 
             
