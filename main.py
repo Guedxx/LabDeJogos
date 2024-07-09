@@ -100,6 +100,9 @@ def play(fase:int) -> int:
             game_over(project_directory,janela)
             return 0
 
+        if teclado.key_pressed("ESC"):
+            pause(project_directory,janela,teclado,mouse)
+            return 0
 
         # Código da Orb
 
