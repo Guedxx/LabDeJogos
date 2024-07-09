@@ -80,7 +80,7 @@ def passou_fase(project_directory:str,janela:Window, N_Fase:int) -> None:
     return
     
 
-def game_over(project_directory,janela):
+def game_over(project_directory,janela, teclado, mouse):
     
     Torre = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOver.png"))
     Torre.set_position(5,0)
@@ -165,6 +165,22 @@ def game_over(project_directory,janela):
         if contador_quicadas >= 5:
             SleepyMan.unhide()
             GameOver.draw()
+            
+            if mouse.is_over_area([192, 333], [355, 391]):
+                Yes.draw()
+                
+                if mouse.is_button_pressed(1):
+                    mouse_click = Sound(os.path.join(project_directory, "Sounds", "MENUSelect.ogg"))
+                    mouse_click.play()
+                    menu(project_directory, janela, teclado, mouse)
+            
+            if mouse.is_over_area([457, 333], [548, 391]):
+                No.draw()
+            
+            
+            
+            
+        print(mouse.get_position())
         
 
         SleepyMan.update()
