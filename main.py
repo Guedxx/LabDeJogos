@@ -32,13 +32,21 @@ janela.set_title('King Pong')
 mouse = Window.get_mouse()
 teclado = Window.get_keyboard()
 
-def play():
-
-    #Numero da Fase
-    fase = 0
+def play(fase:int) -> int:
     
     # Início da gameplay
-    backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF1(project_directory, Screen_W, Screen_H)
+    if fase == 0:
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF1(project_directory, Screen_W, Screen_H)
+    elif fase == 1:
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF2(project_directory, Screen_W, Screen_H)
+    if fase == 2:
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF3(project_directory, Screen_W, Screen_H)
+    if fase == 3:
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF4(project_directory, Screen_W, Screen_H)
+    if fase == 4:
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF5(project_directory, Screen_W, Screen_H)
+    if fase == 5:
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF6(project_directory, Screen_W, Screen_H)
 
     # Velocidade da orb
     velx_base = 100
@@ -85,9 +93,11 @@ def play():
 
         if teclado.key_pressed("E"):
             passou_fase(project_directory,janela,fase)
+            return 1
         
         if teclado.key_pressed("F"):
             game_over(project_directory,janela)
+            return 0
 
 
         # Código da Orb
@@ -111,6 +121,7 @@ def play():
 
             if vida_tutoriana == 0:
                 passou_fase(project_directory,janela,fase)
+                return 1
 
 
             velx = -(velx/2)
@@ -294,4 +305,10 @@ def play():
         updateAll(janela, Orb, tutoriana, player)
 
 if gameINIT(project_directory, janela):
-    play()
+    play(0) # Tutoriana
+    play(1) # Dr Rippon
+    play(2) # Cinos
+    play(3) # Ronaldinho Bahiano
+    play(4) # Bulk
+    play(5) # King Pong
+    print("Your're the King Pong!")
