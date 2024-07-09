@@ -237,9 +237,9 @@ def setupF3(project_directory, Screen_W, Screen_H):
     player_dash = Sprite(os.path.join(project_directory, "Sprites", "DASHBAR.png"))
     player_dash .set_position(890, 90)
 
-    tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETSanic.png"),5)
+    tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETSanic.png"),6)
     tutoriana.set_position(0,0)
-    tutoriana.set_sequence_time(0,18,100)
+    tutoriana.set_sequence_time(0,6,100)
     tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
@@ -295,7 +295,7 @@ def setupF5(project_directory, Screen_W, Screen_H):
 
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETBulk.png"),19)
     tutoriana.set_position(0,0)
-    tutoriana.set_sequence_time(0,18,100)
+    tutoriana.set_sequence_time(0,19,100)
     tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
@@ -321,9 +321,9 @@ def setupF6(project_directory, Screen_W, Screen_H):
     player_dash = Sprite(os.path.join(project_directory, "Sprites", "DASHBAR.png"))
     player_dash .set_position(890, 90)
 
-    tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETKingPong.png"),2)
+    tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETKingPong.png"),4)
     tutoriana.set_position(0,0)
-    tutoriana.set_sequence_time(0,18,100)
+    tutoriana.set_sequence_time(0,4,50)
     tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
