@@ -41,13 +41,13 @@ def play(fase:int) -> int:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF1(project_directory, Screen_W, Screen_H)
     elif fase == 1:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed = setupF2(project_directory, Screen_W, Screen_H)
-    if fase == 2:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF3(project_directory, Screen_W, Screen_H)
-    if fase == 3:
+    elif fase == 2:
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed = setupF3(project_directory, Screen_W, Screen_H)
+    elif fase == 3:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF4(project_directory, Screen_W, Screen_H)
-    if fase == 4:
+    elif fase == 4:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF5(project_directory, Screen_W, Screen_H)
-    if fase == 5:
+    elif fase == 5:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF6(project_directory, Screen_W, Screen_H)
 
     #Def Power Up da vez
@@ -346,7 +346,19 @@ def play(fase:int) -> int:
                         vida_player += 1
                         player_hearts.x -= 80
                 
-                
+                if fase == 2:
+                    ajudante.draw()
+                    ajudante.update()
+                    
+                    ajudante.y += ajudanteSpeed * janela.delta_time()
+                    
+                    if ajudante.y <= tutoriana.height:
+                        ajudanteSpeed *= -1
+                        ajudante.y = tutoriana.height
+                    if ajudante.y + ajudante.height >= Screen_H:
+                        ajudanteSpeed *= -1
+                        ajudante.y = Screen_H - ajudante.height
+                    
                 
         #Tutoriana
         if fase == 0:
@@ -384,9 +396,7 @@ def play(fase:int) -> int:
                     Orb.y = ajudante.y + ajudante.height
                 
             
-            
-            
-        print(fase)
+        
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)

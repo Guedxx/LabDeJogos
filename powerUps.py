@@ -23,10 +23,19 @@ def randomLocal(SpriteDePowerUp):
 def powerupSprite(project_directory, int):
     
     if int == 0:
-        PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
-    
+        PowerUpSprite = Animation(os.path.join(project_directory, "Sprites", "POWERUP_Health.png"),2)
+        PowerUpSprite.set_sequence_time(0,2,100)
     if int == 1:
         PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
+    if int == 2:
+        PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
+    if int == 3:
+        PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
+    if int == 4:
+        PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
+    if int == 4:
+        PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
+        
         
     randomLocal(PowerUpSprite)
     return PowerUpSprite

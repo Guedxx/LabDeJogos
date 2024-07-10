@@ -212,7 +212,7 @@ def setupF2(project_directory, Screen_W, Screen_H):
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETDrRippon.png"),18)
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,18,100)
-    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
+    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_DrRippon.png")) 
     tutoriana_pad.set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     tutoriana_hearts.set_position(160, 20)
@@ -247,7 +247,7 @@ def setupF3(project_directory, Screen_W, Screen_H):
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETSanic.png"),6)
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,6,100)
-    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
+    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Cinos.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     tutoriana_hearts.set_position(160, 20)
@@ -258,7 +258,12 @@ def setupF3(project_directory, Screen_W, Screen_H):
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb
+    
+    ajudante = Animation(os.path.join(project_directory, "Sprites", "PAD_PlayerHelper.png"), 2)
+    ajudante.set_sequence_time(0,2,100)
+    ajudante.set_position(Screen_W -  player_pad.width - 10, ((Screen_H  + player.height)/2) - player_pad.height/2)
+    ajudanteSpeed = 300 
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed
 
 # Ronaldinho
 def setupF4(project_directory, Screen_W, Screen_H):
@@ -275,7 +280,7 @@ def setupF4(project_directory, Screen_W, Screen_H):
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETRonaldinhoBahiano.png"),18)
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,18,100)
-    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
+    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Ronaldinho.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     tutoriana_hearts.set_position(160, 20)
@@ -303,7 +308,7 @@ def setupF5(project_directory, Screen_W, Screen_H):
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETBulk.png"),19)
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,19,100)
-    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
+    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Bulk.png")) 
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     tutoriana_hearts.set_position(160, 20)
@@ -331,7 +336,8 @@ def setupF6(project_directory, Screen_W, Screen_H):
     tutoriana = Animation(os.path.join(project_directory, "Sprites", "SHEETKingPong.png"),4)
     tutoriana.set_position(0,0)
     tutoriana.set_sequence_time(0,4,50)
-    tutoriana_pad = Sprite(os.path.join(project_directory, "Sprites", "PAD_Tutoriana.png")) 
+    tutoriana_pad = Animation(os.path.join(project_directory, "Sprites", "PAD_KingPong.png"),2) 
+    tutoriana_pad.set_sequence_time(0,2,100)
     tutoriana_pad .set_position(10, ((Screen_H  + player.height)/2) - tutoriana_pad.height/2)
     tutoriana_hearts = GameImage(os.path.join(project_directory, "Sprites", "HEARTS.png"))
     tutoriana_hearts.set_position(160, 20)
