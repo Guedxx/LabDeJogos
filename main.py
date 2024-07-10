@@ -147,8 +147,8 @@ def play(fase:int) -> int:
                 return 1
 
 
-            velx = -(velx/2)
-            vely = (vely/2)
+            velx = -(velx - 30)
+            vely = (vely - 15)
 
         if Orb.y >= Screen_H - Orb.height: #Parede de Baixo
             sound_wall = Sound(os.path.join(project_directory, "Sounds", "wall_sound.ogg"))
@@ -174,6 +174,16 @@ def play(fase:int) -> int:
             elif abs(Orb.y - (player_pad.y + player_pad.height)) < 20 and vely < 0:
                 vely *= -1 
                 Orb.y = player_pad.y + player_pad.height
+            
+            if MomentumDirection_player == 1 and vely > 0:
+                velx -= Momentum_player
+                vely -= Momentum_player /2
+                vely *= -1
+            if MomentumDirection_player == -1 and vely < 0:
+                velx -= Momentum_player
+                vely -= Momentum_player /2
+                vely *= -1
+
 
         if Orb.collided(tutoriana_pad):
             sound_hit = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
