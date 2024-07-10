@@ -119,8 +119,9 @@ def play(fase:int) -> int:
             return 0
 
         if teclado.key_pressed("ESC"):
-            pause(project_directory,janela,teclado,mouse)
-            return 0
+            if pause(project_directory,janela,teclado,mouse) == 0:
+                return 0
+            
 
         # Código da Orb
 
@@ -452,11 +453,18 @@ def play(fase:int) -> int:
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
 
-if gameINIT(project_directory, janela):
-    play(0) # Tutoriana
-    play(1) # Dr Rippon
-    play(2) # Cinos
-    play(3) # Ronaldinho Bahiano
-    play(4) # Bulk
-    play(5) # King Pong
-    print("Your're the King Pong!")
+while True:
+    if gameINIT(project_directory, janela):
+        lev = 0
+        while True:
+            stage = play(lev)
+            lev += 1
+            if lev == 6 or stage == 0:
+                break
+        
+        if lev == 6:
+            print("Your're the King Pong!")
+        elif stage == 0:
+            continue
+        else:
+            game_over(project_directory, janela, teclado, mouse)
