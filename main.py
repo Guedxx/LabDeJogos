@@ -42,7 +42,7 @@ def play(fase:int) -> int:
     elif fase == 1:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed = setupF2(project_directory, Screen_W, Screen_H)
     elif fase == 2:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed = setupF3(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, ajudanteTempo, ajudanteTempoLoop = setupF3(project_directory, Screen_W, Screen_H)
     elif fase == 3:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF4(project_directory, Screen_W, Screen_H)
     elif fase == 4:
@@ -88,12 +88,11 @@ def play(fase:int) -> int:
     vida_tutoriana = 3
     
     #Infos Power Ups
-    PodeDesenharInimigo = False
-    PoweUpCoolDownInimigo = 600
-    PoweUpCoolDownInimigoLoop = PoweUpCoolDownInimigo
-    
-    PodeDesenharPlayer = False
-    PoweUpCoolDownPlayer = 600
+    PodeDesenhar = False
+    PoweUpCoolDown = 600
+    PoweUpCoolDownLoop = PoweUpCoolDown
+ 
+    ajudanteSpawn = False
     
     
 
@@ -321,24 +320,27 @@ def play(fase:int) -> int:
 
         ##############################################################3
 
-        #Codigo referene aos power ups dos inimigos
+        #Codigo referene aos power ups
         
-        PoweUpCoolDownInimigoLoop -= 100 * janela.delta_time()
+        PoweUpCoolDownLoop -= 100 * janela.delta_time()
         
-        if random.randint(0,100) == 1 and PoweUpCoolDownInimigoLoop <= 0:
+        if random.randint(0,100) == 1 and PoweUpCoolDownLoop <= 0:
                 if fase == 0:
                     PowerUp = powerupSprite(project_directory, fase)
                 else:
                     PowerUp = powerupSprite(project_directory, fase - 1)
-                PodeDesenharInimigo = True
-                PoweUpCoolDownInimigoLoop = PoweUpCoolDownInimigo
-        if PodeDesenharInimigo == True:
+                PodeDesenhar = True
+                PoweUpCoolDownLoop = PoweUpCoolDown
+                     
+                     
+        if PodeDesenhar == True:
                 PowerUp.draw()
-                
-                
+                      
         #PowerUps Player       
         if fase != 0:
             if Orb.collided(PowerUp):
+                PowerUpSound = Sound(os.path.join(project_directory, "Sounds", "powerUp.ogg"))
+                PowerUpSound.play()
                 
                 if fase == 1:                   #Cura o Player com o PowerUp da Tutoriana
                     PowerUp.x = -50
@@ -346,23 +348,52 @@ def play(fase:int) -> int:
                         vida_player += 1
                         player_hearts.x -= 80
                 
-                if fase == 2:
-                    ajudante.draw()
-                    ajudante.update()
-                    
-                    ajudante.y += ajudanteSpeed * janela.delta_time()
-                    
-                    if ajudante.y <= tutoriana.height:
-                        ajudanteSpeed *= -1
-                        ajudante.y = tutoriana.height
-                    if ajudante.y + ajudante.height >= Screen_H:
-                        ajudanteSpeed *= -1
-                        ajudante.y = Screen_H - ajudante.height
-                    
+                if fase == 2:                   #Ativa o ajudando do Player
+                    PowerUp.x = -50
+                    ajudanteSpawn = True
+                    ajudanteTempoLoop = ajudanteTempo
+             
+          
+        #Codigo refente ao ajudante do player          
+        if ajudanteSpawn == True:
+            ajudanteTempoLoop -= 100 * janela.delta_time()
+            if ajudanteTempoLoop > 0:
+                ajudante.draw()
+                ajudante.update()
+                ajudante.y += ajudanteSpeed * janela.delta_time()
                 
+                if ajudante.y <= 150:
+                    ajudanteSpeed *= -1
+                    ajudante.y = 150
+                    
+                if ajudante.y + ajudante.height >= 720:
+                    ajudanteSpeed *= -1
+                    ajudante.y = 720 - ajudante.height
+                    
+                if Orb.collided(ajudante):
+                    sound_hit = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
+                    sound_hit.play()
+                    if abs(Orb.x + Orb.width - ajudante.x) < 20:
+                        velx *= -1
+                        Orb.x = ajudante.x - Orb.width
+                    elif abs(Orb.y + Orb.height - ajudante.y) < 20 and vely > 0:
+                        vely *= -1 
+                        Orb.y = ajudante.y - Orb.height
+                    elif abs(Orb.y - (ajudante.y + ajudante.height)) < 20 and vely < 0:
+                        vely *= -1 
+                        Orb.y = ajudante.y + ajudante.height       
+                    
+                            
+            if ajudanteTempoLoop <= 0:
+                ajudanteSpawn = False
+                            
+                    
+
         #Tutoriana
         if fase == 0:
             if Orb.collided(PowerUp):
+                PowerUpSound = Sound(os.path.join(project_directory, "Sounds", "powerUp.ogg"))
+                PowerUpSound.play()
                 PowerUp.x = -50
                 if vida_tutoriana < 3:
                     vida_tutoriana += 1

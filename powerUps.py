@@ -18,7 +18,7 @@ def randomLocal(SpriteDePowerUp):
     
     
     
-    
+ 
 
 def powerupSprite(project_directory, int):
     
@@ -39,4 +39,3 @@ def powerupSprite(project_directory, int):
         
     randomLocal(PowerUpSprite)
     return PowerUpSprite
-    

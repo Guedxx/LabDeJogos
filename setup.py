@@ -263,7 +263,9 @@ def setupF3(project_directory, Screen_W, Screen_H):
     ajudante.set_sequence_time(0,2,100)
     ajudante.set_position(Screen_W -  player_pad.width - 10, ((Screen_H  + player.height)/2) - player_pad.height/2)
     ajudanteSpeed = 300 
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed
+    ajudanteTempo = 1000
+    ajudanteTempoLoop = ajudanteTempo
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, ajudanteTempo, ajudanteTempoLoop
 
 # Ronaldinho
 def setupF4(project_directory, Screen_W, Screen_H):
