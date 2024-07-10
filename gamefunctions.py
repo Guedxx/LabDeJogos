@@ -59,7 +59,7 @@ def pause(project_directory ,janela,teclado, mouse):
                 mouse_click = Sound(os.path.join(project_directory, "Sounds", "MENUSelect.ogg"))
                 mouse_click.play()
             
-                return 
+                return -1
         
         if mouse.is_over_area([523, 408], [753, 470]): # Botao menu
             Menu.draw()
@@ -69,7 +69,7 @@ def pause(project_directory ,janela,teclado, mouse):
                 mouse_click.play()
                 saida = confirmExit(project_directory,janela,teclado,mouse)
                 if saida == 1:
-                    menu(project_directory, janela, teclado, mouse)
+                    return 0
                 
         
         
