@@ -358,10 +358,14 @@ def play(fase:int) -> int:
                     powerUpAtivo = True
                     tempoDeAtividade = TempodeDeAtividadeBase
                 
-                if fase == 3:                   #Ativa o ajudando do Player
+                if fase == 3:                   #Ativa Speed do player
                     PowerUp.x = -50
                     powerUpAtivo = True
                     tempoDeAtividade = TempodeDeAtividadeBase
+                
+                if fase == 4:                   #Ativa Speed do player
+                    PowerUp.x = -50
+                    vely *= -1
              
           
         #Codigo refente ao ajudante do player          

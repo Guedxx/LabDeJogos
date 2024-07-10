@@ -14,7 +14,7 @@ from gamefunctions import *
 
 def randomLocal(SpriteDePowerUp):
     
-    SpriteDePowerUp.set_position(random.randint(40, 1200),random.randint(140, 630))
+    SpriteDePowerUp.set_position(random.randint(40, 1200),random.randint(150, 630))
     
     
     
