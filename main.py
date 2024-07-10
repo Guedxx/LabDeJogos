@@ -42,7 +42,7 @@ def play(fase:int) -> int:
     elif fase == 1:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed = setupF2(project_directory, Screen_W, Screen_H)
     elif fase == 2:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, ajudanteTempo, ajudanteTempoLoop = setupF3(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, TempodeDeAtividadeBase, tempoDeAtividade = setupF3(project_directory, Screen_W, Screen_H)
     elif fase == 3:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF4(project_directory, Screen_W, Screen_H)
     elif fase == 4:
@@ -58,6 +58,9 @@ def play(fase:int) -> int:
     vely_base = 300
     velx = velx_base
     vely = vely_base
+    
+    #Player
+    velPlayer = 200
 
     # Inicia as animações
     player.play()
@@ -92,7 +95,9 @@ def play(fase:int) -> int:
     PoweUpCoolDown = 600
     PoweUpCoolDownLoop = PoweUpCoolDown
  
-    ajudanteSpawn = False
+    powerUpAtivo = False
+    TempodeDeAtividadeBase = 600
+    tempoDeAtividade = TempodeDeAtividadeBase
     
     
 
@@ -229,7 +234,7 @@ def play(fase:int) -> int:
         #Movements
         if teclado.key_pressed("W"):
 
-            player_pad.y -= (200 * janela.delta_time()) + (Momentum_player * janela.delta_time())
+            player_pad.y -= (velPlayer * janela.delta_time()) + (Momentum_player * janela.delta_time())
 
             if Momentum_player < 100 and player_pad.y > player.height:
                 Momentum_player += 100 * janela.delta_time()
@@ -248,7 +253,7 @@ def play(fase:int) -> int:
         #Tudo que o de cima faz mas condireando a descida
         elif teclado.key_pressed("S"):
 
-            player_pad.y += (200 * janela.delta_time()) + Momentum_player * janela.delta_time()
+            player_pad.y += (velPlayer * janela.delta_time()) + Momentum_player * janela.delta_time()
 
             if Momentum_player < 100  and player_pad.y + player_pad.height < Screen_H :
                 Momentum_player += 100 * janela.delta_time()
@@ -350,14 +355,19 @@ def play(fase:int) -> int:
                 
                 if fase == 2:                   #Ativa o ajudando do Player
                     PowerUp.x = -50
-                    ajudanteSpawn = True
-                    ajudanteTempoLoop = ajudanteTempo
+                    powerUpAtivo = True
+                    tempoDeAtividade = TempodeDeAtividadeBase
+                
+                if fase == 3:                   #Ativa o ajudando do Player
+                    PowerUp.x = -50
+                    powerUpAtivo = True
+                    tempoDeAtividade = TempodeDeAtividadeBase
              
           
         #Codigo refente ao ajudante do player          
-        if ajudanteSpawn == True:
-            ajudanteTempoLoop -= 100 * janela.delta_time()
-            if ajudanteTempoLoop > 0:
+        if powerUpAtivo == True and fase == 2:
+            tempoDeAtividade -= 100 * janela.delta_time()
+            if tempoDeAtividade > 0:
                 ajudante.draw()
                 ajudante.update()
                 ajudante.y += ajudanteSpeed * janela.delta_time()
@@ -384,10 +394,16 @@ def play(fase:int) -> int:
                         Orb.y = ajudante.y + ajudante.height       
                     
                             
-            if ajudanteTempoLoop <= 0:
-                ajudanteSpawn = False
-                            
-                    
+            if tempoDeAtividade <= 0:
+                powerUpAtivo = False
+           
+        #Codigo refente ao speed do player                   
+        if powerUpAtivo == True and fase == 3:
+            tempoDeAtividade -= 100 * janela.delta_time()
+            velPlayer = 400
+            
+            if tempoDeAtividade <= 0:
+                powerUpAtivo = False
 
         #Tutoriana
         if fase == 0:
