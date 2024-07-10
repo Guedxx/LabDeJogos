@@ -20,6 +20,7 @@ from setup import *
 from ingame import *
 from animations import *
 from gamefunctions import *
+from powerUps import *
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -39,7 +40,7 @@ def play(fase:int) -> int:
     if fase == 0:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF1(project_directory, Screen_W, Screen_H)
     elif fase == 1:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF2(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed = setupF2(project_directory, Screen_W, Screen_H)
     if fase == 2:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF3(project_directory, Screen_W, Screen_H)
     if fase == 3:
@@ -49,9 +50,12 @@ def play(fase:int) -> int:
     if fase == 5:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF6(project_directory, Screen_W, Screen_H)
 
+    #Def Power Up da vez
+    PowerUp = powerupSprite(project_directory, fase)
+
     # Velocidade da orb
-    velx_base = 100
-    vely_base = 100
+    velx_base = 300
+    vely_base = 300
     velx = velx_base
     vely = vely_base
 
@@ -82,6 +86,16 @@ def play(fase:int) -> int:
     #Vidas
     vida_player = 3
     vida_tutoriana = 3
+    
+    #Infos Power Ups
+    PodeDesenharInimigo = False
+    PoweUpCoolDownInimigo = 600
+    PoweUpCoolDownInimigoLoop = PoweUpCoolDownInimigo
+    
+    PodeDesenharPlayer = False
+    PoweUpCoolDownPlayer = 600
+    
+    
 
     while True:
         # Desenhar Sprites e GameImages
@@ -304,6 +318,75 @@ def play(fase:int) -> int:
             tutoriana_pad.y = player.height
         if tutoriana_pad.y + tutoriana_pad.height > Screen_H:
             tutoriana_pad.y = Screen_H - tutoriana_pad.height
+
+        ##############################################################3
+
+        #Codigo referene aos power ups dos inimigos
+        
+        PoweUpCoolDownInimigoLoop -= 100 * janela.delta_time()
+        
+        if random.randint(0,100) == 1 and PoweUpCoolDownInimigoLoop <= 0:
+                if fase == 0:
+                    PowerUp = powerupSprite(project_directory, fase)
+                else:
+                    PowerUp = powerupSprite(project_directory, fase - 1)
+                PodeDesenharInimigo = True
+                PoweUpCoolDownInimigoLoop = PoweUpCoolDownInimigo
+        if PodeDesenharInimigo == True:
+                PowerUp.draw()
+                
+                
+        #PowerUps Player       
+        if fase != 0:
+            if Orb.collided(PowerUp):
+                
+                if fase == 1:                   #Cura o Player com o PowerUp da Tutoriana
+                    PowerUp.x = -50
+                    if vida_player < 3:
+                        vida_player += 1
+                        player_hearts.x -= 80
+                
+                
+                
+        #Tutoriana
+        if fase == 0:
+            if Orb.collided(PowerUp):
+                PowerUp.x = -50
+                if vida_tutoriana < 3:
+                    vida_tutoriana += 1
+                    tutoriana_hearts.x += 80
+                    
+        #Dr Rippon
+        if fase == 1:
+            ajudante.draw()
+            ajudante.update()
+            
+            ajudante.y += ajudanteSpeed * janela.delta_time()
+            
+            if ajudante.y <= tutoriana.height:
+                ajudanteSpeed *= -1
+                ajudante.y = tutoriana.height
+            if ajudante.y + ajudante.height >= Screen_H:
+                ajudanteSpeed *= -1
+                ajudante.y = Screen_H - ajudante.height
+            
+            if Orb.collided(ajudante):
+                sound_hit = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
+                sound_hit.play()
+                if abs(Orb.x - (ajudante.x + ajudante.width)) < 20:
+                    velx *= -1
+                    Orb.x = ajudante.x + ajudante.width
+                elif abs(Orb.y + Orb.height - ajudante.y) < 20 and vely > 0:
+                    vely *= -1 
+                    Orb.y = ajudante.y - Orb.height
+                elif abs(Orb.y - (ajudante.y + ajudante.height)) < 20 and vely < 0:
+                    vely *= -1 
+                    Orb.y = ajudante.y + ajudante.height
+                
+            
+            
+            
+        print(fase)
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
