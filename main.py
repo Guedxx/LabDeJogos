@@ -139,6 +139,7 @@ def play(fase:int) -> int:
             velx -= 10
         if  velx < -1000:
             velx += 10
+    
 
         #Colisão Paredes 
         if Orb.x + Orb.width >= Screen_W: # Ponto para Tutoriana
@@ -190,19 +191,19 @@ def play(fase:int) -> int:
                 Orb.y = player_pad.y + player_pad.height
             
             if MomentumDirection_player == 1 and vely > 0:
-                velx -= Momentum_player
-                vely -= Momentum_player 
+                velx += Momentum_enemy * 2
+                vely += Momentum_enemy * 2
                 vely *= -1
             if MomentumDirection_player == -1 and vely < 0:
-                velx -= Momentum_player  
-                vely -= Momentum_player 
+                velx += Momentum_enemy * 2
+                vely += Momentum_enemy * 2
                 vely *= -1
                 
-            if teclado.key_pressed("SPACE"):
+            if teclado.key_pressed("SPACE") and DashNumberPlayer > 0:
                 sound_hit = Sound(os.path.join(project_directory, "Sounds", "ANIMATIONexplosion.ogg"))
                 sound_hit.play()
                 velx *= 1.3
-                vely *= 1.2
+                vely *= 1.5
                 
 
         if Orb.collided(tutoriana_pad):
@@ -218,13 +219,13 @@ def play(fase:int) -> int:
                 vely *= -1 
                 Orb.y = tutoriana_pad.y + tutoriana_pad.height
                 
-            if MomentumDirection_enemy == 1 and vely > 0:
-                velx -= Momentum_enemy
-                vely -= Momentum_enemy
+            if MomentumDirection_enemy == -1 and vely > 0:
+                velx += Momentum_enemy * 2
+                vely += Momentum_enemy * 2
                 vely *= -1
-            if MomentumDirection_enemy == -1 and vely < 0:
-                velx -= Momentum_enemy 
-                vely -= Momentum_enemy
+            if MomentumDirection_enemy == 1 and vely < 0:
+                velx += Momentum_enemy * 2
+                vely += Momentum_enemy * 2
                 vely *= -1
             
         #Movimentação
@@ -263,8 +264,9 @@ def play(fase:int) -> int:
         #Momentum_player Calculations
         if Momentum_player > 0:
             Momentum_player -= 75 * janela.delta_time()
-            if Momentum_player < 0:
+            if Momentum_player < 1 * janela.delta_time():
                 Momentum_player = 0
+                MomentumDirection_player = 0
 
         if MomentumDirection_player == 1:
             player_pad.y -= Momentum_player * janela.delta_time()
@@ -353,6 +355,10 @@ def play(fase:int) -> int:
             MomentumDirection_enemy, Momentum_enemy, DelayReactLoop= IA_tutoriana(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
         if fase == 1:   
             MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
+        if fase == 2:   
+            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_Cinos(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
+        if fase == 3:   
+            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop, tutoriana_dash, DashCoolDownEnemy, DashNumberEnemy  = IA_RonaldinhoBahiano(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy, tutoriana_dash, DashCoolDownEnemy, DashNumberEnemy,DashCoolDown)
 
 
         if MomentumDirection_enemy == 1:
@@ -399,9 +405,11 @@ def play(fase:int) -> int:
                     powerUpAtivo = True
                     tempoDeAtividade = TempodeDeAtividadeBase
                 
-                if fase == 4:                   #Ativa Speed do player
+                if fase == 4:                   #Ativa OLEEE
                     PowerUp.x = -50
                     vely *= -1
+                    if velx > 0:
+                        velx *= -1
              
           
         #Codigo refente ao ajudante do player          
@@ -410,15 +418,23 @@ def play(fase:int) -> int:
             if tempoDeAtividade > 0:
                 ajudante.draw()
                 ajudante.update()
-                ajudante.y += ajudanteSpeed * janela.delta_time()
                 
-                if ajudante.y <= 150:
-                    ajudanteSpeed *= -1
-                    ajudante.y = 150
+                if velx > 600:
+                    if ajudante.y + (ajudante.height/2) < Orb.y + (Orb.height/2):
+                        ajudante.y += 300 * janela.delta_time()
+                    if ajudante.y + (ajudante.height/2) > Orb.y + (Orb.height/2):
+                        ajudante.y -= 300 * janela.delta_time()
                     
-                if ajudante.y + ajudante.height >= 720:
-                    ajudanteSpeed *= -1
-                    ajudante.y = 720 - ajudante.height
+                
+                else:
+                    ajudante.y += ajudanteSpeed * janela.delta_time()
+                    if ajudante.y <= 150:
+                        ajudanteSpeed *= -1
+                        ajudante.y = 150
+                    if ajudante.y + ajudante.height >= 720:
+                        ajudanteSpeed *= -1
+                        ajudante.y = 720 - ajudante.height
+                    
                     
                 if Orb.collided(ajudante):
                     sound_hit = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
@@ -462,11 +478,11 @@ def play(fase:int) -> int:
             
             
             
-            if velx < -600:
+            if velx < -500:
                 if ajudante.y + (ajudante.height/2) < Orb.y + (Orb.height/2):
-                    ajudante.y += 300 * janela.delta_time()
+                    ajudante.y += 400 * janela.delta_time()
                 if ajudante.y + (ajudante.height/2) > Orb.y + (Orb.height/2):
-                    ajudante.y -= 300 * janela.delta_time()
+                    ajudante.y -= 400 * janela.delta_time()
             
             else:
                 ajudante.y += ajudanteSpeed * janela.delta_time()
@@ -492,11 +508,21 @@ def play(fase:int) -> int:
                     vely *= -1 
                     Orb.y = ajudante.y + ajudante.height
                 
-            
+        #Ronaldinho
+        if fase == 3:
+            if random.randint(0,200) == 1 and velx > 0:
+                sound_hit = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg")) #trocar para som de ole
+                sound_hit.play()
+                vely *= -1.2
+                velx *= 1.3
+        
+        
+        
+        
         #GAME OVER
-        #if vida_player == 0:
-            #game_over(project_directory,janela, teclado, mouse)
-            #return 0
+        if vida_player == 0:
+            game_over(project_directory,janela, teclado, mouse)
+            return 0
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
