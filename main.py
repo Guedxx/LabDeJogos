@@ -109,9 +109,6 @@ def play(fase:int) -> int:
         drawAll(backgnd, hotbar, Orb, player_hearts, player_dash, player_pad, player, tutoriana_hearts, tutoriana_dash, tutoriana_pad, tutoriana)
 
 
-        #Codigos referentes ao tutorial
-
-        
 
         if teclado.key_pressed("E"):
             passou_fase(project_directory,janela,fase)
@@ -137,6 +134,11 @@ def play(fase:int) -> int:
             
 
         # Código da Orb
+        
+        if  velx > 1000:
+            velx -= 10
+        if  velx < -1000:
+            velx += 10
 
         #Colisão Paredes 
         if Orb.x + Orb.width >= Screen_W: # Ponto para Tutoriana
@@ -158,7 +160,6 @@ def play(fase:int) -> int:
             if vida_tutoriana == 0:
                 passou_fase(project_directory,janela,fase)
                 return 1
-
 
             velx = -(velx - 30)
             vely = (vely - 15)
@@ -196,7 +197,13 @@ def play(fase:int) -> int:
                 velx -= Momentum_player  
                 vely -= Momentum_player 
                 vely *= -1
-
+                
+            if teclado.key_pressed("SPACE"):
+                sound_hit = Sound(os.path.join(project_directory, "Sounds", "ANIMATIONexplosion.ogg"))
+                sound_hit.play()
+                velx *= 1.3
+                vely *= 1.2
+                
 
         if Orb.collided(tutoriana_pad):
             sound_hit = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
@@ -453,14 +460,24 @@ def play(fase:int) -> int:
             ajudante.draw()
             ajudante.update()
             
-            ajudante.y += ajudanteSpeed * janela.delta_time()
             
-            if ajudante.y <= tutoriana.height:
-                ajudanteSpeed *= -1
-                ajudante.y = tutoriana.height
-            if ajudante.y + ajudante.height >= Screen_H:
-                ajudanteSpeed *= -1
-                ajudante.y = Screen_H - ajudante.height
+            
+            if velx < -600:
+                if ajudante.y + (ajudante.height/2) < Orb.y + (Orb.height/2):
+                    ajudante.y += 300 * janela.delta_time()
+                if ajudante.y + (ajudante.height/2) > Orb.y + (Orb.height/2):
+                    ajudante.y -= 300 * janela.delta_time()
+            
+            else:
+                ajudante.y += ajudanteSpeed * janela.delta_time()
+                if ajudante.y <= tutoriana.height:
+                    ajudanteSpeed *= -1
+                    ajudante.y = tutoriana.height
+                if ajudante.y + ajudante.height >= Screen_H:
+                    ajudanteSpeed *= -1
+                    ajudante.y = Screen_H - ajudante.height
+            
+        
             
             if Orb.collided(ajudante):
                 sound_hit = Sound(os.path.join(project_directory, "Sounds", "paddle_sound.ogg"))
@@ -477,9 +494,9 @@ def play(fase:int) -> int:
                 
             
         #GAME OVER
-        if vida_player == 0:
-            game_over(project_directory,janela, teclado, mouse)
-            return 0
+        #if vida_player == 0:
+            #game_over(project_directory,janela, teclado, mouse)
+            #return 0
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
