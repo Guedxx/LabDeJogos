@@ -195,7 +195,8 @@ def setupF1(project_directory, Screen_W, Screen_H):
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb
+    DelayReact = 200
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
 
 # Dr Rippon
 def setupF2(project_directory, Screen_W, Screen_H):
@@ -228,9 +229,9 @@ def setupF2(project_directory, Screen_W, Screen_H):
     ajudante.set_sequence_time(0,2,100)
     ajudante.set_position(10, player.height + 5)
     ajudanteSpeed = 300 
-
+    DelayReact = 150
     
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, DelayReact
 
 # Cinos
 def setupF3(project_directory, Screen_W, Screen_H):
@@ -265,7 +266,8 @@ def setupF3(project_directory, Screen_W, Screen_H):
     ajudanteSpeed = 300 
     ajudanteTempo = 1000
     ajudanteTempoLoop = ajudanteTempo
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, ajudanteTempo, ajudanteTempoLoop
+    DelayReact = 100
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, ajudanteTempo, ajudanteTempoLoop, DelayReact
 
 # Ronaldinho
 def setupF4(project_directory, Screen_W, Screen_H):
@@ -293,7 +295,8 @@ def setupF4(project_directory, Screen_W, Screen_H):
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb
+    DelayReact = 50
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
 
 # Bulk
 def setupF5(project_directory, Screen_W, Screen_H):
@@ -321,7 +324,8 @@ def setupF5(project_directory, Screen_W, Screen_H):
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb
+    DelayReact = 25
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
 
 # King Pong
 def setupF6(project_directory, Screen_W, Screen_H):
@@ -350,4 +354,5 @@ def setupF6(project_directory, Screen_W, Screen_H):
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb
+    DelayReact = 1
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact

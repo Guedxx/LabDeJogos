@@ -17,9 +17,6 @@ def randomLocal(SpriteDePowerUp):
     SpriteDePowerUp.set_position(random.randint(40, 1200),random.randint(150, 630))
     
     
-    
- 
-
 def powerupSprite(project_directory, int):
     
     if int == 0:

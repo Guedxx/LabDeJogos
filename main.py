@@ -39,17 +39,17 @@ def play(fase:int) -> int:
     
     # Início da gameplay
     if fase == 0:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF1(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF1(project_directory, Screen_W, Screen_H)
     elif fase == 1:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed = setupF2(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, DelayReact = setupF2(project_directory, Screen_W, Screen_H)
     elif fase == 2:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, TempodeDeAtividadeBase, tempoDeAtividade = setupF3(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, TempodeDeAtividadeBase, tempoDeAtividade, DelayReact = setupF3(project_directory, Screen_W, Screen_H)
     elif fase == 3:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF4(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF4(project_directory, Screen_W, Screen_H)
     elif fase == 4:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF5(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF5(project_directory, Screen_W, Screen_H)
     elif fase == 5:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb = setupF6(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF6(project_directory, Screen_W, Screen_H)
 
     #Def Power Up da vez
     PowerUp = powerupSprite(project_directory, fase)
@@ -100,7 +100,6 @@ def play(fase:int) -> int:
     TempodeDeAtividadeBase = 600
     tempoDeAtividade = TempodeDeAtividadeBase
     
-    DelayReact = 200
     DelayReactLoop = DelayReact
     
     
@@ -300,29 +299,42 @@ def play(fase:int) -> int:
         # CODIGOS REFERENTES AO INIMIGO
         
         #Momentum Enemy Calculations
-        if Momentum_enemy >= 0:
+        if Momentum_enemy > 0:
             Momentum_enemy -= 75 * janela.delta_time()
-            if Momentum_enemy < 0:
+            if Momentum_enemy <= 0:
                 Momentum_enemy = 0
+                MomentumDirection_enemy = 0
 
         if MomentumDirection_enemy == 1:
             tutoriana_pad.y -= Momentum_enemy * janela.delta_time()
         elif MomentumDirection_enemy == -1:
             tutoriana_pad.y += Momentum_enemy * janela.delta_time()
-        
+        if MomentumDirection_enemy == 0:
+            pass
         #Colide Walls
         if tutoriana_pad.y < player.height:
             tutoriana_pad.y = player.height
+            Momentum_enemy = 0
+            MomentumDirection_enemy = 0
         if tutoriana_pad.y + tutoriana_pad.height > Screen_H:
             tutoriana_pad.y = Screen_H - tutoriana_pad.height
+            Momentum_enemy = 0
+            MomentumDirection_enemy = 0
             
-        DelayReactLoop -= 10000 * janela.delta_time() #Contabiliza o tempo de reação das IAS
-        
+            
+        DelayReactLoop -= 1000 * janela.delta_time() #Contabiliza o tempo de reação das IAS
         if fase == 0:   
-            MomentumDirection_enemy= IA_tutoriana(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop)
+            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop= IA_tutoriana(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
         if fase == 1:   
-            MomentumDirection_enemy  = IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop)
+            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
 
+        print(MomentumDirection_enemy)
+        print(Momentum_enemy)
+
+        if MomentumDirection_enemy == 1:
+            tutoriana_pad.y -= (Momentum_enemy * janela.delta_time())
+        if MomentumDirection_enemy == -1:
+            tutoriana_pad.y += (Momentum_enemy * janela.delta_time())
         ##############################################################3
 
         #Codigo referene aos power ups
