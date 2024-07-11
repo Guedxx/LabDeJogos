@@ -30,7 +30,7 @@ def powerupSprite(project_directory, int):
         PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
     if int == 4:
         PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
-    if int == 4:
+    if int == 5:
         PowerUpSprite = GameImage(os.path.join(project_directory, "Sprites", "POWERUP_PlaceHolder.png"))
         
         
