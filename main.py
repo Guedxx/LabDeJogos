@@ -21,6 +21,7 @@ from ingame import *
 from animations import *
 from gamefunctions import *
 from powerUps import *
+from enemysIA import *
 
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
@@ -98,6 +99,9 @@ def play(fase:int) -> int:
     powerUpAtivo = False
     TempodeDeAtividadeBase = 600
     tempoDeAtividade = TempodeDeAtividadeBase
+    
+    DelayReact = 200
+    DelayReactLoop = DelayReact
     
     
 
@@ -293,10 +297,9 @@ def play(fase:int) -> int:
                 Momentum_player += Momentum_player * janela.delta_time()
 
 
-
-        #IA Tutoriana  v0.1
-
-        #Momentum Tutoriana Calculations
+        # CODIGOS REFERENTES AO INIMIGO
+        
+        #Momentum Enemy Calculations
         if Momentum_enemy >= 0:
             Momentum_enemy -= 75 * janela.delta_time()
             if Momentum_enemy < 0:
@@ -306,33 +309,19 @@ def play(fase:int) -> int:
             tutoriana_pad.y -= Momentum_enemy * janela.delta_time()
         elif MomentumDirection_enemy == -1:
             tutoriana_pad.y += Momentum_enemy * janela.delta_time()
-
-        #Sobe em relaçâo ao orb
-        if tutoriana_pad.y + tutoriana_pad.height/2 < Orb.y + Orb.height /2 and velx < 0 and Orb.x < Screen_W/2:
-
-            tutoriana_pad.y += (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
-
-            MomentumDirection_enemy = -1
-
-            if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
-                Momentum_enemy += 100 * janela.delta_time()
-                
-
-        #Desce em relaçâo ao orb
-        if tutoriana_pad.y + tutoriana_pad.height/2 > Orb.y + Orb.height /2 and velx < 0 and Orb.x < Screen_W/2:
-
-            tutoriana_pad.y -= (200 * janela.delta_time()) + (Momentum_enemy * janela.delta_time())
-
-            MomentumDirection_enemy = 1
-
-            if Momentum_enemy < 100 and tutoriana_pad.y > player.height:
-                Momentum_enemy += 100 * janela.delta_time()
         
         #Colide Walls
         if tutoriana_pad.y < player.height:
             tutoriana_pad.y = player.height
         if tutoriana_pad.y + tutoriana_pad.height > Screen_H:
             tutoriana_pad.y = Screen_H - tutoriana_pad.height
+            
+        DelayReactLoop -= 10000 * janela.delta_time() #Contabiliza o tempo de reação das IAS
+        
+        if fase == 0:   
+            MomentumDirection_enemy= IA_tutoriana(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop)
+        if fase == 1:   
+            MomentumDirection_enemy  = IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop)
 
         ##############################################################3
 
@@ -458,7 +447,10 @@ def play(fase:int) -> int:
                     Orb.y = ajudante.y + ajudante.height
                 
             
-        
+        #GAME OVER
+        if vida_player == 0:
+            game_over(project_directory,janela, teclado, mouse)
+            return 0
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
