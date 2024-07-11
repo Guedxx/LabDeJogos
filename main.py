@@ -526,6 +526,8 @@ def play(fase:int) -> int:
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
+        if fase == 5:
+            tutoriana_pad.update()
 
 def prePlay():
     lev = 0
