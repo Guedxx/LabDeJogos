@@ -180,11 +180,11 @@ def play(fase:int) -> int:
             
             if MomentumDirection_player == 1 and vely > 0:
                 velx -= Momentum_player
-                vely -= Momentum_player /2
+                vely -= Momentum_player 
                 vely *= -1
             if MomentumDirection_player == -1 and vely < 0:
-                velx -= Momentum_player
-                vely -= Momentum_player /2
+                velx -= Momentum_player  
+                vely -= Momentum_player 
                 vely *= -1
 
 
@@ -200,6 +200,15 @@ def play(fase:int) -> int:
             elif abs(Orb.y - (tutoriana_pad.y + tutoriana_pad.height)) < 20 and vely < 0:
                 vely *= -1 
                 Orb.y = tutoriana_pad.y + tutoriana_pad.height
+                
+            if MomentumDirection_enemy == 1 and vely > 0:
+                velx -= Momentum_enemy
+                vely -= Momentum_enemy
+                vely *= -1
+            if MomentumDirection_enemy == -1 and vely < 0:
+                velx -= Momentum_enemy 
+                vely -= Momentum_enemy
+                vely *= -1
             
         #Movimentação
         Orb.x += velx * janela.delta_time()
@@ -235,7 +244,7 @@ def play(fase:int) -> int:
             player_dash.x -= 80
 
         #Momentum_player Calculations
-        if Momentum_player >= 0:
+        if Momentum_player > 0:
             Momentum_player -= 75 * janela.delta_time()
             if Momentum_player < 0:
                 Momentum_player = 0
@@ -322,14 +331,12 @@ def play(fase:int) -> int:
             MomentumDirection_enemy = 0
             
             
-        DelayReactLoop -= 1000 * janela.delta_time() #Contabiliza o tempo de reação das IAS
+        DelayReactLoop -= 1500 * janela.delta_time() #Contabiliza o tempo de reação das IAS
         if fase == 0:   
             MomentumDirection_enemy, Momentum_enemy, DelayReactLoop= IA_tutoriana(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
         if fase == 1:   
             MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
 
-        print(MomentumDirection_enemy)
-        print(Momentum_enemy)
 
         if MomentumDirection_enemy == 1:
             tutoriana_pad.y -= (Momentum_enemy * janela.delta_time())

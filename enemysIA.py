@@ -49,12 +49,12 @@ def IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy , DelayReactLoo
             
     if MomentumDirection_enemy == -1 and velx < 0:
 
-        tutoriana_pad.y += (210 * janela.delta_time()) + (Momentum_enemy * janela.delta_time()) # Subir
+        tutoriana_pad.y += (225 * janela.delta_time()) + (Momentum_enemy * janela.delta_time()) # Subir
         if Momentum_enemy < 100 and tutoriana_pad.y > 150:
                 Momentum_enemy += 100 * janela.delta_time()
     
     if MomentumDirection_enemy == 1 and velx < 0:
-        tutoriana_pad.y -= (210 * janela.delta_time()) + (Momentum_enemy * janela.delta_time()) #Descer
+        tutoriana_pad.y -= (225 * janela.delta_time()) + (Momentum_enemy * janela.delta_time()) #Descer
         if Momentum_enemy < 100 and tutoriana_pad.y > 150:
                 Momentum_enemy += 100 * janela.delta_time()
     
