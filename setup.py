@@ -230,8 +230,9 @@ def setupF2(project_directory, Screen_W, Screen_H):
     ajudante.set_position(10, player.height + 5)
     ajudanteSpeed = 300 
     DelayReact = 150
+
     
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, DelayReact
+    return GameImage(os.path.join(project_directory, "Sprites", "LV2_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, DelayReact
 
 # Cinos
 def setupF3(project_directory, Screen_W, Screen_H):
@@ -267,7 +268,9 @@ def setupF3(project_directory, Screen_W, Screen_H):
     ajudanteTempo = 1000
     ajudanteTempoLoop = ajudanteTempo
     DelayReact = 100
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, ajudanteTempo, ajudanteTempoLoop, DelayReact
+    background = Animation(os.path.join(project_directory, "Sprites", "LV3_background.png"), 2)
+    background.set_sequence_time(0,2,500)
+    return background, GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, ajudante, ajudanteSpeed, ajudanteTempo, ajudanteTempoLoop, DelayReact
 
 # Ronaldinho
 def setupF4(project_directory, Screen_W, Screen_H):
