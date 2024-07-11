@@ -115,8 +115,18 @@ def play(fase:int) -> int:
             return 1
         
         if teclado.key_pressed("F"):
-            game_over(project_directory,janela, teclado, mouse)
-            return 0
+            nex = game_over(project_directory,janela, teclado, mouse)
+            # Se o player apertar em desistir o jogo fecha
+            if nex == 0:
+                # Desistiu
+                return -1
+            elif nex == 1:
+                # Se apertar em continuar, novo loop é iniciado
+                # Tentar de novo
+                return 0
+                
+
+            
 
         if teclado.key_pressed("ESC"):
             if pause(project_directory,janela,teclado,mouse) == 0:
@@ -453,18 +463,35 @@ def play(fase:int) -> int:
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
 
-while True:
+def prePlay():
+    lev = 0
+    while True:
+        stage = play(lev)
+        lev += 1
+        if lev == 6 or stage == 0 or stage == -1:
+            break
+    
+    if lev == 6:
+        # Ganhou o jogo
+        return 1
+    elif stage == 0:
+        return 0
+    elif stage == -1:
+        # Desistiu
+        main()
+
+
+def main():
+    
     if gameINIT(project_directory, janela):
-        lev = 0
-        while True:
-            stage = play(lev)
-            lev += 1
-            if lev == 6 or stage == 0:
+        while True: 
+            aux = prePlay()
+            if aux == -1:
                 break
-        
-        if lev == 6:
-            print("Your're the King Pong!")
-        elif stage == 0:
-            continue
-        else:
-            game_over(project_directory, janela, teclado, mouse)
+            elif aux == 0:
+                continue
+            elif aux == 6:
+                print("You're the King Pong")
+                break
+
+main()
