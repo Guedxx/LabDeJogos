@@ -108,6 +108,12 @@ def play(fase:int) -> int:
     TempoLerdo = 300
     TempoLerdoLoop = TempoLerdo
     
+    #King Pong IS HELD!!!!
+    IsHeld = False
+    HeldTime = 300
+    HeldTimeLoop = HeldTime
+    
+    Num_Hits = 0
 
     while True:
         # Desenhar Sprites e GameImages
@@ -162,15 +168,14 @@ def play(fase:int) -> int:
             Orb.x = 2
             tutoriana_hearts.x -= 80 # -1 coração para Tutoriana 
             vida_tutoriana -= 1
+            Num_Hits += 1
 
             if vida_tutoriana == 0 and fase != 5:
                 passou_fase(project_directory,janela,fase)
                 return 1
-            if vida_tutoriana and fase == 5:
+            if vida_tutoriana == -1 and fase == 5:
                 zerou(project_directory,janela, teclado, mouse)
-                return 1
-            
-            #FAZER CHAMAR CREDITOS
+                return 0
 
             velx = -(velx - 30)
             vely = (vely - 15)
@@ -370,7 +375,11 @@ def play(fase:int) -> int:
         if fase == 3:   
             MomentumDirection_enemy, Momentum_enemy, DelayReactLoop, tutoriana_dash, DashCoolDownEnemy, DashNumberEnemy  = IA_RonaldinhoBahiano(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy, tutoriana_dash, DashCoolDownEnemy, DashNumberEnemy,DashCoolDown)
         if fase == 4:
-            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
+            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_Bulk(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
+        if fase == 5:
+            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_KingPong(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy, Num_Hits)
+
+
 
         if MomentumDirection_enemy == 1:
             tutoriana_pad.y -= (Momentum_enemy * janela.delta_time())
@@ -382,14 +391,18 @@ def play(fase:int) -> int:
         
         PoweUpCoolDownLoop -= 100 * janela.delta_time()
         
-        if random.randint(0,100) == 1 and PoweUpCoolDownLoop <= 0:
+        if random.randint(0,100) == 1 and PoweUpCoolDownLoop <= 0 and fase != 5:
                 if fase == 0:
                     PowerUp = powerupSprite(project_directory, fase)
                 else:
                     PowerUp = powerupSprite(project_directory, fase - 1)
                 PodeDesenhar = True
                 PoweUpCoolDownLoop = PoweUpCoolDown
-                     
+         
+        if random.randint(0,100) == 1 and PoweUpCoolDownLoop <= 0 and fase == 5 and Num_Hits == 2:
+            PowerUp = powerupSprite(project_directory, fase - 1)
+            PodeDesenhar = True
+            PoweUpCoolDownLoop = PoweUpCoolDown       
                      
         if PodeDesenhar == True:
                 PowerUp.draw()
@@ -399,28 +412,35 @@ def play(fase:int) -> int:
             if Orb.collided(PowerUp):
                 PowerUpSound = Sound(os.path.join(project_directory, "Sounds", "powerUp.ogg"))
                 PowerUpSound.play()
+                PowerUp.x = -50
                 
                 if fase == 1:                   #Cura o Player com o PowerUp da Tutoriana
-                    PowerUp.x = -50
+                    
                     if vida_player < 3:
                         vida_player += 1
                         player_hearts.x -= 80
                 
                 if fase == 2:                   #Ativa o ajudando do Player
-                    PowerUp.x = -50
+                    
                     powerUpAtivo = True
                     tempoDeAtividade = TempodeDeAtividadeBase
                 
                 if fase == 3:                   #Ativa Speed do player
-                    PowerUp.x = -50
+                    
                     powerUpAtivo = True
                     tempoDeAtividade = TempodeDeAtividadeBase
                 
                 if fase == 4:                   #Ativa OLEEE
-                    PowerUp.x = -50
+                    
                     vely *= -1
                     if velx > 0:
                         velx *= -1
+                
+                if fase == 5:
+                    IsHeld = True
+                    HeldTimeLoop = HeldTime
+                    Xatual, Yatual = tutoriana_pad.x, tutoriana_pad.y
+                    
              
           
         #Codigo refente ao ajudante do player          
@@ -526,12 +546,11 @@ def play(fase:int) -> int:
                 sound_hit.play()
                 vely *= -1.2
                 velx *= 1.3
-        
-        print(TempoDeSegurarLoop)
+    
         #Bulk
         if fase == 4:
             
-            if tutoriana_pad.collided(Orb) and random.randint(0,1) == 1:
+            if tutoriana_pad.collided(Orb) and random.randint(0,10) == 1:
                 if EstaSegurando == False:
                     TempoDeSegurarLoop = TempoDeSegurar
                 EstaSegurando = True
@@ -571,8 +590,13 @@ def play(fase:int) -> int:
                     Lerdeza = False
                     velPlayer = 200
         
-        
-        
+        #King Pong
+        if fase == 5 and Num_Hits == 2:
+            if IsHeld == True:
+                tutoriana_pad.x, tutoriana_pad.y = Xatual, Yatual
+                HeldTimeLoop -= 100 * janela.delta_time()
+                if HeldTimeLoop <= 0:
+                    IsHeld = False
         
         #GAME OVER
         if vida_player == 0:
@@ -612,7 +636,7 @@ def main():
             if aux == -1:
                 break
             elif aux == 0:
-                continue
+                #continue
                 main()
             elif aux == 6:
                 print("You're the King Pong")
