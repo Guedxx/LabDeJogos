@@ -113,21 +113,26 @@ def menu(project_directory, janela, teclado, mouse):
 
         #Loop musica menu
         if menu_music.is_playing() == False:
-            menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
             menu_music.play()
 
         if dificuldade_menu == -1: #Dificuldade easy
             Fundo_EASY.draw()
             Fundo_EASY.update()
             side_bar = GameImage(os.path.join(project_directory, "Sprites", "MENU_side_easy.png"))
+            
+            
         if dificuldade_menu == 0: #Dificuldade normal
             Fundo_NORMAL.draw()
             Fundo_NORMAL.update()
             side_bar = GameImage(os.path.join(project_directory, "Sprites", "MENU_side_normal.png"))
+            
+            
         if dificuldade_menu == 1: #Dificuldade hard
             Fundo_HARD.draw()
             Fundo_HARD.update()
             side_bar = GameImage(os.path.join(project_directory, "Sprites", "MENU_side_hard.png"))
+            
+            
         
             
 
@@ -152,6 +157,16 @@ def menu(project_directory, janela, teclado, mouse):
                 elif dificuldade_menu == 1:
                     dificuldade_menu = -1
                 cooldown_dificuldade = 30
+                if dificuldade_menu == 0:
+                    menu_music = Sound(os.path.join(project_directory, "Sounds", "menu.ogg"))
+                    menu_music.play()
+                if dificuldade_menu == 1:
+                    menu_music = Sound(os.path.join(project_directory, "Sounds", "menuHARD.ogg"))
+                    menu_music.play()
+                if dificuldade_menu == -1:
+                    menu_music = Sound(os.path.join(project_directory, "Sounds", "menuEASY.ogg"))
+                    menu_music.play()
+                    
                 
                 
                 

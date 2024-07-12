@@ -209,4 +209,19 @@ def game_over(project_directory:str,janela:Window, teclado:Keyboard, mouse:Mouse
         janela.update()
     
 def zerou(project_directory:str,janela:Window,teclado:Keyboard, mouse:Mouse ):
-    pass  
+    You_Are =  GameImage(os.path.join(project_directory, "Sprites", "ENDGAME.png"))
+    Credits =  GameImage(os.path.join(project_directory, "Sprites", "ENDGAMECREDITS.png"))
+    
+    
+    tempo = 100
+    while tempo >= 0:
+        
+        tempo -= 10 * janela.delta_time()
+        You_Are.draw()
+        janela.update()
+
+    while Credits.y > -720:
+        Credits.draw()
+        janela.update()
+        Credits.y -= 100 * janela.delta_time()
+    

@@ -122,8 +122,12 @@ def play(fase:int) -> int:
 
 
         if teclado.key_pressed("E"):
-            passou_fase(project_directory,janela,fase)
-            return 1
+            if fase != 5:
+                passou_fase(project_directory,janela,fase)
+                return 1
+            if fase == 5:
+                zerou(project_directory,janela, teclado, mouse)
+                return 0
         
         if teclado.key_pressed("F"):
             nex = game_over(project_directory,janela, teclado, mouse)
@@ -135,6 +139,8 @@ def play(fase:int) -> int:
                 # Se apertar em continuar, novo loop é iniciado
                 # Tentar de novo
                 return 0
+            
+    
                 
 
             
@@ -170,10 +176,10 @@ def play(fase:int) -> int:
             vida_tutoriana -= 1
             Num_Hits += 1
 
-            if vida_tutoriana == 0 and fase != 5:
+            if vida_tutoriana <= 0 and fase != 5:
                 passou_fase(project_directory,janela,fase)
                 return 1
-            if vida_tutoriana == -1 and fase == 5:
+            if vida_tutoriana <= -1 and fase == 5:
                 zerou(project_directory,janela, teclado, mouse)
                 return 0
 
@@ -399,7 +405,7 @@ def play(fase:int) -> int:
                 PodeDesenhar = True
                 PoweUpCoolDownLoop = PoweUpCoolDown
          
-        if random.randint(0,100) == 1 and PoweUpCoolDownLoop <= 0 and fase == 5 and Num_Hits == 2:
+        if random.randint(0,100) == 1 and PoweUpCoolDownLoop <= 0 and fase == 5 and Num_Hits >= 2:
             PowerUp = powerupSprite(project_directory, fase - 1)
             PodeDesenhar = True
             PoweUpCoolDownLoop = PoweUpCoolDown       
