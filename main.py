@@ -22,7 +22,7 @@ from animations import *
 from gamefunctions import *
 from powerUps import *
 from enemysIA import *
-
+pygame.init()
 #Cria o diretório do arquivo principal. Garante compatibilidade com MAC e LINUX
 project_directory = os.path.dirname(__file__)
 
@@ -47,9 +47,9 @@ def play(fase:int) -> int:
     elif fase == 3:
         backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF4(project_directory, Screen_W, Screen_H)
     elif fase == 4:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF5(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar,BulkSegura, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF5(project_directory, Screen_W, Screen_H)
     elif fase == 5:
-        backgnd, hotbar, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF6(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar,BulkSegura, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF6(project_directory, Screen_W, Screen_H)
 
     #Def Power Up da vez
     PowerUp = powerupSprite(project_directory, fase)
@@ -95,13 +95,18 @@ def play(fase:int) -> int:
     PodeDesenhar = False
     PoweUpCoolDown = 600
     PoweUpCoolDownLoop = PoweUpCoolDown
- 
     powerUpAtivo = False
     TempodeDeAtividadeBase = 600
     tempoDeAtividade = TempodeDeAtividadeBase
-    
     DelayReactLoop = DelayReact
-    
+    #Bulk HOLDS!!!
+    EstaSegurando = False
+    TempoDeSegurar = 200
+    TempoDeSegurarLoop = TempoDeSegurar
+    Jogada = False
+    Lerdeza = False
+    TempoLerdo = 300
+    TempoLerdoLoop = TempoLerdo
     
 
     while True:
@@ -359,7 +364,8 @@ def play(fase:int) -> int:
             MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_Cinos(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
         if fase == 3:   
             MomentumDirection_enemy, Momentum_enemy, DelayReactLoop, tutoriana_dash, DashCoolDownEnemy, DashNumberEnemy  = IA_RonaldinhoBahiano(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy, tutoriana_dash, DashCoolDownEnemy, DashNumberEnemy,DashCoolDown)
-
+        if fase == 4:
+            MomentumDirection_enemy, Momentum_enemy, DelayReactLoop  = IA_DrRippon(tutoriana_pad, Orb, velx, janela, Momentum_enemy, DelayReactLoop, DelayReact, MomentumDirection_enemy)
 
         if MomentumDirection_enemy == 1:
             tutoriana_pad.y -= (Momentum_enemy * janela.delta_time())
@@ -515,6 +521,51 @@ def play(fase:int) -> int:
                 sound_hit.play()
                 vely *= -1.2
                 velx *= 1.3
+        
+        print(TempoDeSegurarLoop)
+        #Bulk
+        if fase == 4:
+            
+            if tutoriana_pad.collided(Orb) and random.randint(0,1) == 1:
+                print("bateu")
+                if EstaSegurando == False:
+                    TempoDeSegurarLoop = TempoDeSegurar
+                EstaSegurando = True
+                Direct = random.randint(-1, 1)
+                if Direct == 0:
+                    Direct = -1
+                Jogada = True
+                
+            if EstaSegurando == True:
+                #BulkSegura = Sprite(os.path.join(project_directory, "Sprites", "PAD_BulkHold.png"))
+                BulkSegura.draw()
+                MomentumDirection_enemy = 0
+                BulkSegura.x = tutoriana_pad.x
+                BulkSegura.y = tutoriana_pad.y
+                
+                Orb.x = BulkSegura.x + 50 
+                Orb.y = ((BulkSegura.y + (BulkSegura.height/2)) - Orb.height/2)
+                velx -= 100 * janela.delta_time()
+                vely *= Direct
+                
+                if TempoDeSegurarLoop > 0:
+                    TempoDeSegurarLoop -= 100 * janela.delta_time()
+                if TempoDeSegurarLoop <= 0:
+                    EstaSegurando = False
+                
+            if Jogada == True and Orb.collided(player_pad):
+                velx /= 1.3
+                vely /= 1.3
+                Jogada = False
+                Lerdeza = True
+            
+            if Lerdeza == True:
+                TempoLerdoLoop -= 100 * janela.delta_time()
+                velPlayer = 100
+                Momentum_player = 0
+                if TempoLerdoLoop <= 0:
+                    Lerdeza = False
+                    velPlayer = 200
         
         
         

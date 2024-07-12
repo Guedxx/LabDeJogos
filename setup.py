@@ -327,8 +327,8 @@ def setupF5(project_directory, Screen_W, Screen_H):
     Orb.set_position(Screen_W/2, (Screen_H  )/2)
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
-    DelayReact = 25
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
+    DelayReact = 20
+    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), Sprite(os.path.join(project_directory, "Sprites", "PAD_BulkHold.png")) ,player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
 
 # King Pong
 def setupF6(project_directory, Screen_W, Screen_H):
