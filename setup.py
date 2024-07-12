@@ -299,7 +299,9 @@ def setupF4(project_directory, Screen_W, Screen_H):
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
     DelayReact = 50
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
+    background = Animation(os.path.join(project_directory, "Sprites", "LV4_background.png"),2)
+    background.set_sequence_time(0,2,300)
+    return background, GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
 
 # Bulk
 def setupF5(project_directory, Screen_W, Screen_H):
@@ -328,7 +330,7 @@ def setupF5(project_directory, Screen_W, Screen_H):
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
     DelayReact = 20
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), Sprite(os.path.join(project_directory, "Sprites", "PAD_BulkHold.png")) ,player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
+    return GameImage(os.path.join(project_directory, "Sprites", "LV5_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), Sprite(os.path.join(project_directory, "Sprites", "PAD_BulkHold.png")) ,player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
 
 # King Pong
 def setupF6(project_directory, Screen_W, Screen_H):
@@ -359,4 +361,4 @@ def setupF6(project_directory, Screen_W, Screen_H):
     vel_animation = 100
     Orb.set_sequence_time(0,8, vel_animation)
     DelayReact = 1
-    return GameImage(os.path.join(project_directory, "Sprites", "LV1_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact
+    return GameImage(os.path.join(project_directory, "Sprites", "LV6_background.png")), GameImage(os.path.join(project_directory, "Sprites", "HOTBAR.png")), player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact

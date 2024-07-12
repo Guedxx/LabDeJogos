@@ -49,7 +49,7 @@ def play(fase:int) -> int:
     elif fase == 4:
         backgnd, hotbar,BulkSegura, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF5(project_directory, Screen_W, Screen_H)
     elif fase == 5:
-        backgnd, hotbar,BulkSegura, player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF6(project_directory, Screen_W, Screen_H)
+        backgnd, hotbar,player, player_pad, player_hearts, player_dash, tutoriana, tutoriana_pad, tutoriana_hearts, tutoriana_dash, Orb, DelayReact = setupF6(project_directory, Screen_W, Screen_H)
 
     #Def Power Up da vez
     PowerUp = powerupSprite(project_directory, fase)
@@ -527,7 +527,6 @@ def play(fase:int) -> int:
         if fase == 4:
             
             if tutoriana_pad.collided(Orb) and random.randint(0,1) == 1:
-                print("bateu")
                 if EstaSegurando == False:
                     TempoDeSegurarLoop = TempoDeSegurar
                 EstaSegurando = True
@@ -577,7 +576,7 @@ def play(fase:int) -> int:
 
         #Update das Animations
         updateAll(janela, Orb, tutoriana, player)
-        if fase == 2:
+        if fase == 2 or fase == 3:
             backgnd.update()
         if fase == 5:
             tutoriana_pad.update()
@@ -609,6 +608,7 @@ def main():
                 break
             elif aux == 0:
                 continue
+                main()
             elif aux == 6:
                 print("You're the King Pong")
                 break
