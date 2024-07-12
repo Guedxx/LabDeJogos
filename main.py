@@ -636,10 +636,11 @@ def main():
             if aux == -1:
                 break
             elif aux == 0:
-                #continue
+                continue
                 main()
-            elif aux == 6:
+            elif aux == 1:
                 print("You're the King Pong")
+                main()
                 break
 
 main()
