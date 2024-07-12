@@ -83,20 +83,25 @@ def passou_fase(project_directory:str,janela:Window, N_Fase:int) -> None:
 def game_over(project_directory:str,janela:Window, teclado:Keyboard, mouse:Mouse):
     
     Torre = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOver.png"))
-    Torre.set_position(5,0)
+    Torre.set_position(2,0)
     FallMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverChar.png"), 8)
     FallMan.set_sequence_time(0,8,50)
     FallMan.set_position(750, 100)
     
     SleepyMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverEepy.png"), 6)
     SleepyMan.set_sequence_time(0,6,300)
-    SleepyMan.set_position(540, 575)
+    SleepyMan.set_position(540, 579)
     SleepyMan.hide()
     
+    WalkingMan = Animation(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverWalking.png"),4)
+    WalkingMan.set_sequence_time(0,4,150)
+    WalkingMan.hide()
+    WalkingMan.set_position(540, 578)
+    TentouAgain = False
     
-    GameOver = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverText.png"))
-    Yes = GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverTextYes.png"))
-    No =  GameImage(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverTextNo.png"))
+    GameOver = Sprite(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverText.png"))
+    Yes = Sprite(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverTextYes.png"))
+    No =  Sprite(os.path.join(project_directory, "Sprites", "ANIMATIONGameOverTextNo.png"))
     
     explosion = Sound(os.path.join(project_directory, "Sounds", "ANIMATIONexplosion.ogg"))
     explosion.play()
@@ -121,6 +126,8 @@ def game_over(project_directory:str,janela:Window, teclado:Keyboard, mouse:Mouse
         if(Torre.y >= -765):
             Torre.y -= fallAceltorre * janela.delta_time()
             fallAceltorre += 100 * janela.delta_time()
+        if(Torre.y <= -765):
+            Torre.y = -765
 
         #Joga boneco para o lado 
         if(FallMan.x >= 540):
@@ -181,15 +188,25 @@ def game_over(project_directory:str,janela:Window, teclado:Keyboard, mouse:Mouse
                 if mouse.is_button_pressed(1):
                     mouse_click = Sound(os.path.join(project_directory, "Sounds", "MENUSelect.ogg"))
                     mouse_click.play()
-                    return 1
+                    SleepyMan.x = -100
+                    GameOver.hide()
+                    Yes.hide()
+                    No.hide()
+                    WalkingMan.unhide()
+                    TentouAgain = True
 
+        if TentouAgain == True:
+            WalkingMan.x += 200 * janela.delta_time()
+            if WalkingMan.x >= 1100:
+                return 1
+                
             
             
             
-            
-        
-
+        WalkingMan.draw()
+        WalkingMan.update()
         SleepyMan.update()
         janela.update()
     
-    
+def zerou(project_directory:str,janela:Window,teclado:Keyboard, mouse:Mouse ):
+    pass  

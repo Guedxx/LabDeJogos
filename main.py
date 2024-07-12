@@ -163,9 +163,14 @@ def play(fase:int) -> int:
             tutoriana_hearts.x -= 80 # -1 coração para Tutoriana 
             vida_tutoriana -= 1
 
-            if vida_tutoriana == 0:
+            if vida_tutoriana == 0 and fase != 5:
                 passou_fase(project_directory,janela,fase)
                 return 1
+            if vida_tutoriana and fase == 5:
+                zerou(project_directory,janela, teclado, mouse)
+                return 1
+            
+            #FAZER CHAMAR CREDITOS
 
             velx = -(velx - 30)
             vely = (vely - 15)
