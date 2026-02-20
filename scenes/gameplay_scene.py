@@ -14,7 +14,7 @@ from settings import (
     MOMENTUM_DECAY, MOMENTUM_CAP, MOMENTUM_GAIN_PLAYER,
     PLAYER_HEARTS_POS, PLAYER_DASH_POS,
     ENEMY_HEARTS_POS, ENEMY_DASH_POS,
-    POWERUP_COOLDOWN, POWERUP_SPAWN_CHANCE, POWERUP_ACTIVITY_BASE,
+    POWERUP_COOLDOWN, POWERUP_ACTIVITY_BASE,
     POWERUP_TICK_SPEED, DELAY_REACT_TICK_SPEED,
     BULK_HOLD_TIME, BULK_SLOW_TIME, BULK_SLOW_SPEED, BULK_HOLD_CHANCE,
     KING_PONG_HOLD_TIME,
@@ -22,23 +22,38 @@ from settings import (
     ORB_FRAMES, ORB_FRAME_DURATION,
     MAIN_CHAR_FRAMES, MAIN_CHAR_FRAME_DURATION,
     PLAYER_PAD_OFFSET_X, ENEMY_PAD_X,
-    HELPER_PATROL_MIN_Y,
 )
 from entities import Paddle, AnimatedEntity, Ball, HelperPaddle, PowerUp
 from ai import EnemyAI
 from hud import HUD
+from scenes.gameplay_update_systems import (
+    update_helpers as run_helper_update,
+    update_powerups as run_powerup_update,
+)
+from logic.ball_rules import accelerate_ball, clamp_ball_speed_framewise, resolve_wall_and_scoring
 from logic.collisions import (
     apply_enemy_momentum_deflection,
     apply_player_momentum_deflection,
     resolve_paddle_bounce,
 )
-from logic.helpers import patrol_vertical, track_target_center
-from logic.physics import accelerate_towards_cap, apply_speed_soft_limit, decay_momentum
-from logic.powerups import (
-    resolve_powerup_collision,
-    should_spawn_powerup,
-    spawn_source_level,
-    update_speed_powerup,
+from logic.enemy_rules import (
+    apply_enemy_momentum_motion,
+    apply_post_ai_momentum_motion,
+    clamp_enemy_bounds,
+    decay_enemy_momentum,
+    tick_delay_react,
+)
+from logic.level_mechanics import (
+    apply_ronaldinho_ole,
+    update_bulk_hold_mechanic,
+    update_king_pong_freeze,
+)
+from logic.player_rules import (
+    apply_player_input,
+    apply_player_momentum_motion,
+    clamp_player_bounds,
+    decay_player_momentum,
+    update_player_dash_state,
 )
 
 
@@ -244,8 +259,7 @@ class GameplayScene(BaseScene):
         keys = pygame.key.get_pressed()
 
         # ---- Ball speed clamping ----
-        # Keep legacy frame-based clamp behaviour by using dt=1.0.
-        self.vel_x = apply_speed_soft_limit(self.vel_x, BALL_SPEED_CAP, 10, 1.0)
+        self.vel_x = clamp_ball_speed_framewise(self.vel_x, BALL_SPEED_CAP, 10)
 
         # ---- Ball wall collisions ----
         transition = self._ball_wall_collisions(dt)
@@ -260,15 +274,11 @@ class GameplayScene(BaseScene):
         self.ball.y += self.vel_y * dt
 
         # ---- Ball speed gradual increase ----
-        self.vel_x = accelerate_towards_cap(
+        self.vel_x, self.vel_y = accelerate_ball(
             self.vel_x,
-            BALL_CRUISE_SPEED,
-            BALL_SPEED_ACCEL_X,
-            dt,
-        )
-        self.vel_y = accelerate_towards_cap(
             self.vel_y,
             BALL_CRUISE_SPEED,
+            BALL_SPEED_ACCEL_X,
             BALL_SPEED_ACCEL_Y,
             dt,
         )
@@ -280,10 +290,10 @@ class GameplayScene(BaseScene):
         self._update_enemy_ai(dt)
 
         # ---- Power-ups ----
-        self._update_powerups(dt)
+        run_powerup_update(self, dt)
 
         # ---- Helpers ----
-        self._update_helpers(dt)
+        run_helper_update(self, dt)
 
         # ---- Level-specific mechanics ----
         self._update_level_mechanics(dt)
@@ -354,44 +364,37 @@ class GameplayScene(BaseScene):
     # Ball-wall collisions
     # ------------------------------------------------------------------
     def _ball_wall_collisions(self, dt) -> SceneTransition | None:
-        assets = self.game.assets
+        outcome = resolve_wall_and_scoring(
+            ball_x=self.ball.x,
+            ball_y=self.ball.y,
+            ball_w=self.ball.width,
+            ball_h=self.ball.height,
+            vel_x=self.vel_x,
+            vel_y=self.vel_y,
+            lives_player=self.lives_player,
+            lives_enemy=self.lives_enemy,
+            num_hits=self.num_hits,
+            level_index=self.level_index,
+            screen_w=SCREEN_WIDTH,
+            screen_h=SCREEN_HEIGHT,
+            char_h=self.enemy_anim.height,
+        )
 
-        # Right wall -> enemy scores
-        if self.ball.x + self.ball.width >= SCREEN_WIDTH:
-            assets.play_sfx("hit_sound.ogg")
-            self.ball.x = SCREEN_WIDTH - self.ball.width - 2
-            self.lives_player -= 1
-            self.vel_x = -(self.vel_x / 2)
-            self.vel_y = self.vel_y / 2
+        for sound_name in outcome.sounds:
+            self.game.assets.play_sfx(sound_name)
 
-        # Left wall -> player scores
-        if self.ball.x <= 0:
-            assets.play_sfx("hit_sound.ogg")
-            self.ball.x = 2
-            self.lives_enemy -= 1
-            self.num_hits += 1
+        self.ball.x = outcome.ball_x
+        self.ball.y = outcome.ball_y
+        self.vel_x = outcome.vel_x
+        self.vel_y = outcome.vel_y
+        self.lives_player = outcome.lives_player
+        self.lives_enemy = outcome.lives_enemy
+        self.num_hits = outcome.num_hits
 
-            if self.lives_enemy <= 0 and self.level_index != 5:
-                return SceneTransition("level_clear", level=self.level_index)
-            if self.lives_enemy <= -1 and self.level_index == 5:
-                return SceneTransition("credits")
-
-            self.vel_x = -(self.vel_x - 30)
-            self.vel_y = self.vel_y - 15
-
-        # Bottom wall
-        if self.ball.y >= SCREEN_HEIGHT - self.ball.height:
-            assets.play_sfx("wall_sound.ogg")
-            self.ball.y = SCREEN_HEIGHT - self.ball.height
-            self.vel_y *= -1
-
-        # Top wall (below character banner)
-        char_h = self.enemy_anim.height
-        if self.ball.y <= char_h:
-            assets.play_sfx("wall_sound.ogg")
-            self.ball.y = char_h
-            self.vel_y *= -1
-
+        if outcome.transition_target == "level_clear":
+            return SceneTransition("level_clear", level=outcome.transition_level)
+        if outcome.transition_target == "credits":
+            return SceneTransition("credits")
         return None
 
     # ------------------------------------------------------------------
@@ -471,76 +474,80 @@ class GameplayScene(BaseScene):
         char_h = self.player_anim.height
 
         # Dash counters
-        self.dash_cooldown_player -= 1
-        if self.first_dash_player:
-            self.dash_reload_player -= 1
-        if self.dash_number_player >= MAX_DASHES:
-            self.first_dash_player = False
-        if (self.dash_reload_player <= 0
-                and self.dash_number_player < MAX_DASHES):
-            self.dash_number_player += 1
-            self.dash_reload_player = DASH_RELOAD
+        dash = update_player_dash_state(
+            dash_cooldown=self.dash_cooldown_player,
+            dash_reload=self.dash_reload_player,
+            dash_number=self.dash_number_player,
+            first_dash=self.first_dash_player,
+            max_dashes=MAX_DASHES,
+            dash_reload_max=DASH_RELOAD,
+        )
+        self.dash_cooldown_player = dash.dash_cooldown
+        self.dash_reload_player = dash.dash_reload
+        self.dash_number_player = dash.dash_number
+        self.first_dash_player = dash.first_dash
 
         # Player momentum decay
-        if self.momentum_player > 0:
-            self.momentum_player = decay_momentum(self.momentum_player, MOMENTUM_DECAY, dt)
-            if self.momentum_player < 1 * dt:
-                self.momentum_player = 0
-                self.momentum_dir_player = 0
+        momentum = decay_player_momentum(
+            momentum=self.momentum_player,
+            momentum_direction=self.momentum_dir_player,
+            decay_rate=MOMENTUM_DECAY,
+            dt=dt,
+        )
+        self.momentum_player = momentum.momentum
+        self.momentum_dir_player = momentum.momentum_direction
 
         # Momentum movement
-        if self.momentum_dir_player == 1:
-            self.player_pad.y -= self.momentum_player * dt
-        elif self.momentum_dir_player == -1:
-            self.player_pad.y += self.momentum_player * dt
+        self.player_pad.y = apply_player_momentum_motion(
+            y=self.player_pad.y,
+            momentum=self.momentum_player,
+            momentum_direction=self.momentum_dir_player,
+            dt=dt,
+        )
 
-        # W = up
-        if keys[pygame.K_w]:
-            self.player_pad.y -= (self.vel_player * dt
-                                  + self.momentum_player * dt)
-            if (self.momentum_player < MOMENTUM_CAP
-                    and self.player_pad.y > char_h):
-                self.momentum_player += MOMENTUM_GAIN_PLAYER * dt
-            self.momentum_dir_player = 1
-
-            if (keys[pygame.K_SPACE]
-                    and self.dash_cooldown_player < 0
-                    and self.dash_number_player > 0):
-                self.first_dash_player = True
-                self.player_pad.y -= DASH_MOVE_BOOST_UP * dt
-                self.momentum_player += DASH_MOMENTUM_BOOST * dt
-                self.dash_cooldown_player = DASH_COOLDOWN
-                self.dash_number_player -= 1
-
-        # S = down
-        elif keys[pygame.K_s]:
-            self.player_pad.y += (self.vel_player * dt
-                                  + self.momentum_player * dt)
-            if (self.momentum_player < MOMENTUM_CAP
-                    and self.player_pad.y + self.player_pad.height < SCREEN_HEIGHT):
-                self.momentum_player += MOMENTUM_GAIN_PLAYER * dt
-            self.momentum_dir_player = -1
-
-            if (keys[pygame.K_SPACE]
-                    and self.dash_cooldown_player < 0
-                    and self.dash_number_player > 0):
-                self.first_dash_player = True
-                self.player_pad.y += DASH_MOVE_BOOST_DOWN * dt
-                self.momentum_player += DASH_MOMENTUM_BOOST * dt
-                self.dash_cooldown_player = DASH_COOLDOWN
-                self.dash_number_player -= 1
+        input_outcome = apply_player_input(
+            y=self.player_pad.y,
+            height=self.player_pad.height,
+            char_h=char_h,
+            screen_h=SCREEN_HEIGHT,
+            vel_player=self.vel_player,
+            momentum=self.momentum_player,
+            momentum_direction=self.momentum_dir_player,
+            press_w=bool(keys[pygame.K_w]),
+            press_s=bool(keys[pygame.K_s]),
+            press_space=bool(keys[pygame.K_SPACE]),
+            dash_cooldown=self.dash_cooldown_player,
+            dash_number=self.dash_number_player,
+            first_dash=self.first_dash_player,
+            momentum_cap=MOMENTUM_CAP,
+            momentum_gain=MOMENTUM_GAIN_PLAYER,
+            dash_move_boost_up=DASH_MOVE_BOOST_UP,
+            dash_move_boost_down=DASH_MOVE_BOOST_DOWN,
+            dash_momentum_boost=DASH_MOMENTUM_BOOST,
+            dash_cooldown_reset=DASH_COOLDOWN,
+            dt=dt,
+        )
+        self.player_pad.y = input_outcome.y
+        self.momentum_player = input_outcome.momentum
+        self.momentum_dir_player = input_outcome.momentum_direction
+        self.dash_cooldown_player = input_outcome.dash_cooldown
+        self.dash_number_player = input_outcome.dash_number
+        self.first_dash_player = input_outcome.first_dash
 
         # Wall clamping
-        if self.player_pad.y < char_h:
-            self.player_pad.y = char_h
-            self.momentum_dir_player = -1
-            if self.momentum_player < MOMENTUM_CAP:
-                self.momentum_player += self.momentum_player * dt
-        elif self.player_pad.y + self.player_pad.height > SCREEN_HEIGHT:
-            self.player_pad.y = SCREEN_HEIGHT - self.player_pad.height
-            self.momentum_dir_player = 1
-            if self.momentum_player < MOMENTUM_CAP:
-                self.momentum_player += self.momentum_player * dt
+        clamp_outcome, clamped_y = clamp_player_bounds(
+            y=self.player_pad.y,
+            height=self.player_pad.height,
+            char_h=char_h,
+            screen_h=SCREEN_HEIGHT,
+            momentum=self.momentum_player,
+            momentum_direction=self.momentum_dir_player,
+            momentum_cap=MOMENTUM_CAP,
+            dt=dt,
+        )
+        self.player_pad.y = clamped_y
+        self.momentum_player = clamp_outcome.momentum
+        self.momentum_dir_player = clamp_outcome.momentum_direction
 
     # ------------------------------------------------------------------
     # Enemy AI
@@ -549,30 +556,41 @@ class GameplayScene(BaseScene):
         char_h = self.player_anim.height
 
         # Enemy momentum decay
-        if self.momentum_enemy > 0:
-            self.momentum_enemy = decay_momentum(self.momentum_enemy, MOMENTUM_DECAY, dt)
-            if self.momentum_enemy <= 0:
-                self.momentum_enemy = 0
-                self.momentum_dir_enemy = 0
+        decayed = decay_enemy_momentum(
+            momentum=self.momentum_enemy,
+            momentum_direction=self.momentum_dir_enemy,
+            decay_rate=MOMENTUM_DECAY,
+            dt=dt,
+        )
+        self.momentum_enemy = decayed.momentum
+        self.momentum_dir_enemy = decayed.momentum_direction
 
         # Momentum movement (applied before AI)
-        if self.momentum_dir_enemy == 1:
-            self.enemy_pad.y -= self.momentum_enemy * dt
-        elif self.momentum_dir_enemy == -1:
-            self.enemy_pad.y += self.momentum_enemy * dt
+        self.enemy_pad.y = apply_enemy_momentum_motion(
+            y=self.enemy_pad.y,
+            momentum=self.momentum_enemy,
+            momentum_direction=self.momentum_dir_enemy,
+            dt=dt,
+        )
 
         # Wall clamping
-        if self.enemy_pad.y < char_h:
-            self.enemy_pad.y = char_h
-            self.momentum_enemy = 0
-            self.momentum_dir_enemy = 0
-        if self.enemy_pad.y + self.enemy_pad.height > SCREEN_HEIGHT:
-            self.enemy_pad.y = SCREEN_HEIGHT - self.enemy_pad.height
-            self.momentum_enemy = 0
-            self.momentum_dir_enemy = 0
+        self.enemy_pad.y, clamp_outcome = clamp_enemy_bounds(
+            y=self.enemy_pad.y,
+            height=self.enemy_pad.height,
+            min_y=char_h,
+            max_y=SCREEN_HEIGHT,
+            momentum=self.momentum_enemy,
+            momentum_direction=self.momentum_dir_enemy,
+        )
+        self.momentum_enemy = clamp_outcome.momentum
+        self.momentum_dir_enemy = clamp_outcome.momentum_direction
 
         # Delay react countdown
-        self.delay_react_loop -= DELAY_REACT_TICK_SPEED * dt
+        self.delay_react_loop = tick_delay_react(
+            self.delay_react_loop,
+            DELAY_REACT_TICK_SPEED,
+            dt,
+        )
 
         # Run AI
         result = self.ai.update(
@@ -606,205 +624,12 @@ class GameplayScene(BaseScene):
             self.enemy_pad.y += result["pad_dy"]
 
         # Post-AI momentum movement
-        if self.momentum_dir_enemy == 1:
-            self.enemy_pad.y -= self.momentum_enemy * dt
-        elif self.momentum_dir_enemy == -1:
-            self.enemy_pad.y += self.momentum_enemy * dt
-
-    # ------------------------------------------------------------------
-    # Power-ups
-    # ------------------------------------------------------------------
-    def _update_powerups(self, dt):
-        assets = self.game.assets
-        level = self.level_index
-
-        self.power_up_cooldown -= POWERUP_TICK_SPEED * dt
-
-        # Spawn logic
-        roll = random.randint(0, 100)
-        if should_spawn_powerup(
-            level_index=level,
-            cooldown=self.power_up_cooldown,
-            num_hits=self.num_hits,
-            roll=roll,
-            trigger_roll=POWERUP_SPAWN_CHANCE,
-        ):
-            pu_level = spawn_source_level(level)
-            pu_name = LEVELS[pu_level]["power_up_sprite"]
-            pu_frames = LEVELS[pu_level]["power_up_frames"]
-            pu_sheet = assets.get_spritesheet(pu_name, pu_frames, 100)
-            self.power_up = PowerUp(pu_sheet, self.cfg["power_up_type"])
-            self.power_up.randomize_position()
-            self.can_draw_powerup = True
-            self.power_up_cooldown = POWERUP_COOLDOWN
-
-        # Animate power-up
-        if self.can_draw_powerup:
-            self.power_up.update_animation(dt * 1000)
-
-        # Collision with ball
-        self.ball.sync_rect()
-        self.power_up.sync_rect()
-
-        if self.power_up.visible and self.ball.rect.colliderect(self.power_up.rect):
-            assets.play_sfx("powerUp.ogg")
-            self.power_up.deactivate()
-            self.can_draw_powerup = False
-
-            outcome = resolve_powerup_collision(
-                level_index=level,
-                lives_player=self.lives_player,
-                lives_enemy=self.lives_enemy,
-                vel_x=self.vel_x,
-                vel_y=self.vel_y,
-                power_up_active=self.power_up_active,
-                power_up_activity_timer=self.power_up_activity_timer,
-                is_frozen=self.is_frozen,
-                freeze_timer=self.freeze_timer,
-                enemy_pad_position=(self.enemy_pad.x, self.enemy_pad.y),
-                max_lives=MAX_LIVES,
-                activity_base=POWERUP_ACTIVITY_BASE,
-                freeze_duration=KING_PONG_HOLD_TIME,
-            )
-            self.lives_player = outcome.lives_player
-            self.lives_enemy = outcome.lives_enemy
-            self.vel_x = outcome.vel_x
-            self.vel_y = outcome.vel_y
-            self.power_up_active = outcome.power_up_active
-            self.power_up_activity_timer = outcome.power_up_activity_timer
-            self.is_frozen = outcome.is_frozen
-            self.freeze_timer = outcome.freeze_timer
-            self.frozen_pos = outcome.frozen_pos
-
-        # Speed power-up (Ronaldinho level)
-        self.power_up_active, self.power_up_activity_timer, self.vel_player = update_speed_powerup(
-            level_index=level,
-            power_up_active=self.power_up_active,
-            power_up_activity_timer=self.power_up_activity_timer,
-            current_player_speed=self.vel_player,
+        self.enemy_pad.y = apply_post_ai_momentum_motion(
+            y=self.enemy_pad.y,
+            momentum=self.momentum_enemy,
+            momentum_direction=self.momentum_dir_enemy,
             dt=dt,
-            tick_speed=POWERUP_TICK_SPEED,
-            base_player_speed=PLAYER_SPEED,
-            boosted_player_speed=400,
         )
-
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
-    def _update_helpers(self, dt):
-        level = self.level_index
-        char_h = self.player_anim.height
-
-        # Enemy helper (Dr. Rippon - level 1)
-        if self.enemy_helper and level == 1:
-            self.enemy_helper.update_animation(dt * 1000)
-            threshold = self.cfg["enemy_helper_track_threshold"]
-            track_speed = self.cfg["enemy_helper_track_speed"]
-            helper = self.enemy_helper
-
-            if self.vel_x < threshold:
-                # Track ball
-                helper.y = track_target_center(
-                    y=helper.y,
-                    height=helper.height,
-                    target_y=self.ball.y,
-                    target_height=self.ball.height,
-                    speed=track_speed,
-                    dt=dt,
-                )
-            else:
-                # Patrol
-                helper.y, helper.patrol_direction = patrol_vertical(
-                    y=helper.y,
-                    height=helper.height,
-                    min_y=char_h,
-                    max_y=SCREEN_HEIGHT,
-                    speed=helper.speed,
-                    direction=helper.patrol_direction,
-                    dt=dt,
-                )
-
-            # Helper-ball collision
-            helper.sync_rect()
-            self.ball.sync_rect()
-            if self.ball.rect.colliderect(helper.rect):
-                self.game.assets.play_sfx("paddle_sound.ogg")
-                bx = self.ball.x
-                by = self.ball.y
-                bw = self.ball.width
-                bh = self.ball.height
-                hx = helper.x
-                hy = helper.y
-                hw = helper.width
-                hh = helper.height
-                self.ball.x, self.ball.y, self.vel_x, self.vel_y = resolve_paddle_bounce(
-                    ball_x=bx,
-                    ball_y=by,
-                    ball_w=bw,
-                    ball_h=bh,
-                    pad_x=hx,
-                    pad_y=hy,
-                    pad_w=hw,
-                    pad_h=hh,
-                    vel_x=self.vel_x,
-                    vel_y=self.vel_y,
-                    front_face="left",
-                )
-
-        # Player helper (Cinos - level 2, only when power-up active)
-        if self.player_helper and level == 2 and self.power_up_active:
-            self.power_up_activity_timer -= POWERUP_TICK_SPEED * dt
-            helper = self.player_helper
-            helper.update_animation(dt * 1000)
-
-            if self.power_up_activity_timer > 0:
-                threshold = self.cfg["player_helper_track_threshold"]
-                track_speed = self.cfg["player_helper_track_speed"]
-
-                if self.vel_x > threshold:
-                    helper.y = track_target_center(
-                        y=helper.y,
-                        height=helper.height,
-                        target_y=self.ball.y,
-                        target_height=self.ball.height,
-                        speed=track_speed,
-                        dt=dt,
-                    )
-                else:
-                    helper.y, helper.patrol_direction = patrol_vertical(
-                        y=helper.y,
-                        height=helper.height,
-                        min_y=HELPER_PATROL_MIN_Y,
-                        max_y=SCREEN_HEIGHT,
-                        speed=helper.speed,
-                        direction=helper.patrol_direction,
-                        dt=dt,
-                    )
-
-                # Helper-ball collision
-                helper.sync_rect()
-                self.ball.sync_rect()
-                if self.ball.rect.colliderect(helper.rect):
-                    self.game.assets.play_sfx("paddle_sound.ogg")
-                    bx, by = self.ball.x, self.ball.y
-                    bw, bh = self.ball.width, self.ball.height
-                    hx, hy = helper.x, helper.y
-                    hw, hh = helper.width, helper.height
-                    self.ball.x, self.ball.y, self.vel_x, self.vel_y = resolve_paddle_bounce(
-                        ball_x=bx,
-                        ball_y=by,
-                        ball_w=bw,
-                        ball_h=bh,
-                        pad_x=hx,
-                        pad_y=hy,
-                        pad_w=hw,
-                        pad_h=hh,
-                        vel_x=self.vel_x,
-                        vel_y=self.vel_y,
-                        front_face="right",
-                    )
-            else:
-                self.power_up_active = False
 
     # ------------------------------------------------------------------
     # Level-specific mechanics
@@ -812,57 +637,91 @@ class GameplayScene(BaseScene):
     def _update_level_mechanics(self, dt):
         level = self.level_index
 
-        # Ronaldinho random "ole" deflection
-        if level == 3 and self.cfg["has_ole"]:
-            if random.randint(0, 200) == RONALDINHO_OLE_CHANCE and self.vel_x > 0:
-                self.game.assets.play_sfx("paddle_sound.ogg")
-                self.vel_y *= RONALDINHO_OLE_VEL_Y_MULT
-                self.vel_x *= RONALDINHO_OLE_VEL_X_MULT
+        ole = apply_ronaldinho_ole(
+            level_index=level,
+            has_ole=self.cfg["has_ole"],
+            vel_x=self.vel_x,
+            vel_y=self.vel_y,
+            roll=random.randint(0, 200),
+            trigger_roll=RONALDINHO_OLE_CHANCE,
+            vel_y_multiplier=RONALDINHO_OLE_VEL_Y_MULT,
+            vel_x_multiplier=RONALDINHO_OLE_VEL_X_MULT,
+        )
+        self.vel_x = ole.vel_x
+        self.vel_y = ole.vel_y
+        if ole.triggered:
+            self.game.assets.play_sfx("paddle_sound.ogg")
 
-        # Bulk hold mechanic
-        if level == 4 and self.cfg["has_hold"]:
-            self.enemy_pad.sync_rect()
-            self.ball.sync_rect()
-            if (self.ball.rect.colliderect(self.enemy_pad.rect)
-                    and random.randint(0, 10) == BULK_HOLD_CHANCE):
-                if not self.is_holding:
-                    self.hold_timer = BULK_HOLD_TIME
-                self.is_holding = True
-                self.bulk_throw_dir = random.choice([-1, 1])
-                self.thrown = True
+        self.enemy_pad.sync_rect()
+        self.ball.sync_rect()
+        enemy_ball_collided = self.ball.rect.colliderect(self.enemy_pad.rect)
+        hold_roll = -1
+        throw_dir = self.bulk_throw_dir
+        if enemy_ball_collided:
+            hold_roll = random.randint(0, 10)
+            if hold_roll == BULK_HOLD_CHANCE:
+                throw_dir = random.choice([-1, 1])
 
-            if self.is_holding:
-                self.momentum_dir_enemy = 0
-                self.ball.x = self.enemy_pad.x + 50
-                self.ball.y = (self.enemy_pad.y + self.enemy_pad.height / 2
-                               - self.ball.height / 2)
-                self.vel_x -= 100 * dt
-                self.vel_y *= self.bulk_throw_dir
+        player_ball_collided = self.ball.rect.colliderect(self.player_pad.rect)
 
-                self.hold_timer -= POWERUP_TICK_SPEED * dt
-                if self.hold_timer <= 0:
-                    self.is_holding = False
+        bulk = update_bulk_hold_mechanic(
+            level_index=level,
+            has_hold=self.cfg["has_hold"],
+            enemy_ball_collided=enemy_ball_collided,
+            player_ball_collided=player_ball_collided,
+            hold_roll=hold_roll,
+            hold_trigger_roll=BULK_HOLD_CHANCE,
+            throw_direction_roll=throw_dir,
+            is_holding=self.is_holding,
+            hold_timer=self.hold_timer,
+            thrown=self.thrown,
+            is_slow=self.is_slow,
+            slow_timer=self.slow_timer,
+            bulk_throw_dir=self.bulk_throw_dir,
+            momentum_dir_enemy=self.momentum_dir_enemy,
+            momentum_player=self.momentum_player,
+            vel_player=self.vel_player,
+            vel_x=self.vel_x,
+            vel_y=self.vel_y,
+            ball_x=self.ball.x,
+            ball_y=self.ball.y,
+            ball_h=self.ball.height,
+            enemy_pad_x=self.enemy_pad.x,
+            enemy_pad_y=self.enemy_pad.y,
+            enemy_pad_h=self.enemy_pad.height,
+            dt=dt,
+            hold_duration=BULK_HOLD_TIME,
+            slow_duration=BULK_SLOW_TIME,
+            tick_speed=POWERUP_TICK_SPEED,
+            slow_player_speed=BULK_SLOW_SPEED,
+            base_player_speed=PLAYER_SPEED,
+        )
+        self.is_holding = bulk.is_holding
+        self.hold_timer = bulk.hold_timer
+        self.thrown = bulk.thrown
+        self.is_slow = bulk.is_slow
+        self.slow_timer = bulk.slow_timer
+        self.bulk_throw_dir = bulk.bulk_throw_dir
+        self.momentum_dir_enemy = bulk.momentum_dir_enemy
+        self.momentum_player = bulk.momentum_player
+        self.vel_player = bulk.vel_player
+        self.vel_x = bulk.vel_x
+        self.vel_y = bulk.vel_y
+        self.ball.x = bulk.ball_x
+        self.ball.y = bulk.ball_y
 
-            if self.thrown and self.ball.rect.colliderect(self.player_pad.rect):
-                self.vel_x /= 1.3
-                self.vel_y /= 1.3
-                self.thrown = False
-                self.is_slow = True
-                self.slow_timer = BULK_SLOW_TIME
-
-            if self.is_slow:
-                self.slow_timer -= POWERUP_TICK_SPEED * dt
-                self.vel_player = BULK_SLOW_SPEED
-                self.momentum_player = 0
-                if self.slow_timer <= 0:
-                    self.is_slow = False
-                    self.vel_player = PLAYER_SPEED
-
-        # King Pong freeze (only when num_hits == 2)
-        if level == 5 and self.num_hits == 2:
-            if self.is_frozen:
-                self.enemy_pad.x = self.frozen_pos[0]
-                self.enemy_pad.y = self.frozen_pos[1]
-                self.freeze_timer -= POWERUP_TICK_SPEED * dt
-                if self.freeze_timer <= 0:
-                    self.is_frozen = False
+        freeze = update_king_pong_freeze(
+            level_index=level,
+            num_hits=self.num_hits,
+            is_frozen=self.is_frozen,
+            freeze_timer=self.freeze_timer,
+            enemy_pad_x=self.enemy_pad.x,
+            enemy_pad_y=self.enemy_pad.y,
+            frozen_pos=self.frozen_pos,
+            dt=dt,
+            tick_speed=POWERUP_TICK_SPEED,
+        )
+        self.is_frozen = freeze.is_frozen
+        self.freeze_timer = freeze.freeze_timer
+        self.enemy_pad.x = freeze.enemy_pad_x
+        self.enemy_pad.y = freeze.enemy_pad_y
