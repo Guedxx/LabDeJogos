@@ -1,0 +1,2 @@
+"""Pure gameplay logic helpers."""
+

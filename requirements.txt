@@ -1,1 +1,2 @@
-pygame-ce
+pygame-ce==2.5.6
+pytest==9.0.2

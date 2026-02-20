@@ -27,6 +27,13 @@ from settings import (
 from entities import Paddle, AnimatedEntity, Ball, HelperPaddle, PowerUp
 from ai import EnemyAI
 from hud import HUD
+from logic.physics import accelerate_towards_cap, apply_speed_soft_limit, decay_momentum
+from logic.powerups import (
+    resolve_powerup_collision,
+    should_spawn_powerup,
+    spawn_source_level,
+    update_speed_powerup,
+)
 
 
 class GameplayScene(BaseScene):
@@ -208,6 +215,12 @@ class GameplayScene(BaseScene):
     # Events
     # ------------------------------------------------------------------
     def handle_events(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_n:
+                if self.level_index < 5:
+                    return SceneTransition("level_clear", level=self.level_index)
+                return SceneTransition("credits")
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             return SceneTransition("pause", level=self.level_index,
@@ -225,10 +238,8 @@ class GameplayScene(BaseScene):
         keys = pygame.key.get_pressed()
 
         # ---- Ball speed clamping ----
-        if self.vel_x > BALL_SPEED_CAP:
-            self.vel_x -= 10
-        if self.vel_x < -BALL_SPEED_CAP:
-            self.vel_x += 10
+        # Keep legacy frame-based clamp behaviour by using dt=1.0.
+        self.vel_x = apply_speed_soft_limit(self.vel_x, BALL_SPEED_CAP, 10, 1.0)
 
         # ---- Ball wall collisions ----
         transition = self._ball_wall_collisions(dt)
@@ -243,14 +254,18 @@ class GameplayScene(BaseScene):
         self.ball.y += self.vel_y * dt
 
         # ---- Ball speed gradual increase ----
-        if 0 < self.vel_x < BALL_CRUISE_SPEED:
-            self.vel_x += BALL_SPEED_ACCEL_X * dt
-        elif -BALL_CRUISE_SPEED < self.vel_x < 0:
-            self.vel_x -= BALL_SPEED_ACCEL_X * dt
-        if 0 < self.vel_y < BALL_CRUISE_SPEED:
-            self.vel_y += BALL_SPEED_ACCEL_Y * dt
-        elif -BALL_CRUISE_SPEED < self.vel_y < 0:
-            self.vel_y -= BALL_SPEED_ACCEL_Y * dt
+        self.vel_x = accelerate_towards_cap(
+            self.vel_x,
+            BALL_CRUISE_SPEED,
+            BALL_SPEED_ACCEL_X,
+            dt,
+        )
+        self.vel_y = accelerate_towards_cap(
+            self.vel_y,
+            BALL_CRUISE_SPEED,
+            BALL_SPEED_ACCEL_Y,
+            dt,
+        )
 
         # ---- Player input ----
         self._handle_player_input(keys, dt)
@@ -458,7 +473,7 @@ class GameplayScene(BaseScene):
 
         # Player momentum decay
         if self.momentum_player > 0:
-            self.momentum_player -= MOMENTUM_DECAY * dt
+            self.momentum_player = decay_momentum(self.momentum_player, MOMENTUM_DECAY, dt)
             if self.momentum_player < 1 * dt:
                 self.momentum_player = 0
                 self.momentum_dir_player = 0
@@ -525,7 +540,7 @@ class GameplayScene(BaseScene):
 
         # Enemy momentum decay
         if self.momentum_enemy > 0:
-            self.momentum_enemy -= MOMENTUM_DECAY * dt
+            self.momentum_enemy = decay_momentum(self.momentum_enemy, MOMENTUM_DECAY, dt)
             if self.momentum_enemy <= 0:
                 self.momentum_enemy = 0
                 self.momentum_dir_enemy = 0
@@ -596,28 +611,22 @@ class GameplayScene(BaseScene):
         self.power_up_cooldown -= POWERUP_TICK_SPEED * dt
 
         # Spawn logic
-        if level != 5:
-            if (random.randint(0, 100) == 1
-                    and self.power_up_cooldown <= 0):
-                pu_level = level if level == 0 else level - 1
-                pu_name = LEVELS[pu_level]["power_up_sprite"]
-                pu_frames = LEVELS[pu_level]["power_up_frames"]
-                pu_sheet = assets.get_spritesheet(pu_name, pu_frames, 100)
-                self.power_up = PowerUp(pu_sheet, self.cfg["power_up_type"])
-                self.power_up.randomize_position()
-                self.can_draw_powerup = True
-                self.power_up_cooldown = POWERUP_COOLDOWN
-        else:
-            if (random.randint(0, 100) == 1
-                    and self.power_up_cooldown <= 0
-                    and self.num_hits >= 2):
-                pu_name = LEVELS[4]["power_up_sprite"]
-                pu_frames = LEVELS[4]["power_up_frames"]
-                pu_sheet = assets.get_spritesheet(pu_name, pu_frames, 100)
-                self.power_up = PowerUp(pu_sheet, self.cfg["power_up_type"])
-                self.power_up.randomize_position()
-                self.can_draw_powerup = True
-                self.power_up_cooldown = POWERUP_COOLDOWN
+        roll = random.randint(0, 100)
+        if should_spawn_powerup(
+            level_index=level,
+            cooldown=self.power_up_cooldown,
+            num_hits=self.num_hits,
+            roll=roll,
+            trigger_roll=POWERUP_SPAWN_CHANCE,
+        ):
+            pu_level = spawn_source_level(level)
+            pu_name = LEVELS[pu_level]["power_up_sprite"]
+            pu_frames = LEVELS[pu_level]["power_up_frames"]
+            pu_sheet = assets.get_spritesheet(pu_name, pu_frames, 100)
+            self.power_up = PowerUp(pu_sheet, self.cfg["power_up_type"])
+            self.power_up.randomize_position()
+            self.can_draw_powerup = True
+            self.power_up_cooldown = POWERUP_COOLDOWN
 
         # Animate power-up
         if self.can_draw_powerup:
@@ -627,51 +636,47 @@ class GameplayScene(BaseScene):
         self.ball.sync_rect()
         self.power_up.sync_rect()
 
-        # Level 0 special: enemy heal
-        if level == 0:
-            if self.power_up.visible and self.ball.rect.colliderect(self.power_up.rect):
-                assets.play_sfx("powerUp.ogg")
-                self.power_up.deactivate()
-                self.can_draw_powerup = False
-                if self.lives_enemy < MAX_LIVES:
-                    self.lives_enemy += 1
+        if self.power_up.visible and self.ball.rect.colliderect(self.power_up.rect):
+            assets.play_sfx("powerUp.ogg")
+            self.power_up.deactivate()
+            self.can_draw_powerup = False
 
-        # Levels 1-5: player power-ups
-        elif level >= 1:
-            if self.power_up.visible and self.ball.rect.colliderect(self.power_up.rect):
-                assets.play_sfx("powerUp.ogg")
-                self.power_up.deactivate()
-                self.can_draw_powerup = False
-
-                if level == 1:  # Player heal
-                    if self.lives_player < MAX_LIVES:
-                        self.lives_player += 1
-
-                elif level == 2:  # Activate player helper
-                    self.power_up_active = True
-                    self.power_up_activity_timer = POWERUP_ACTIVITY_BASE
-
-                elif level == 3:  # Speed boost
-                    self.power_up_active = True
-                    self.power_up_activity_timer = POWERUP_ACTIVITY_BASE
-
-                elif level == 4:  # Reflect ball
-                    self.vel_y *= -1
-                    if self.vel_x > 0:
-                        self.vel_x *= -1
-
-                elif level == 5:  # Freeze enemy
-                    self.is_frozen = True
-                    self.freeze_timer = KING_PONG_HOLD_TIME
-                    self.frozen_pos = (self.enemy_pad.x, self.enemy_pad.y)
+            outcome = resolve_powerup_collision(
+                level_index=level,
+                lives_player=self.lives_player,
+                lives_enemy=self.lives_enemy,
+                vel_x=self.vel_x,
+                vel_y=self.vel_y,
+                power_up_active=self.power_up_active,
+                power_up_activity_timer=self.power_up_activity_timer,
+                is_frozen=self.is_frozen,
+                freeze_timer=self.freeze_timer,
+                enemy_pad_position=(self.enemy_pad.x, self.enemy_pad.y),
+                max_lives=MAX_LIVES,
+                activity_base=POWERUP_ACTIVITY_BASE,
+                freeze_duration=KING_PONG_HOLD_TIME,
+            )
+            self.lives_player = outcome.lives_player
+            self.lives_enemy = outcome.lives_enemy
+            self.vel_x = outcome.vel_x
+            self.vel_y = outcome.vel_y
+            self.power_up_active = outcome.power_up_active
+            self.power_up_activity_timer = outcome.power_up_activity_timer
+            self.is_frozen = outcome.is_frozen
+            self.freeze_timer = outcome.freeze_timer
+            self.frozen_pos = outcome.frozen_pos
 
         # Speed power-up (Ronaldinho level)
-        if self.power_up_active and level == 3:
-            self.power_up_activity_timer -= POWERUP_TICK_SPEED * dt
-            self.vel_player = 400
-            if self.power_up_activity_timer <= 0:
-                self.power_up_active = False
-                self.vel_player = PLAYER_SPEED
+        self.power_up_active, self.power_up_activity_timer, self.vel_player = update_speed_powerup(
+            level_index=level,
+            power_up_active=self.power_up_active,
+            power_up_activity_timer=self.power_up_activity_timer,
+            current_player_speed=self.vel_player,
+            dt=dt,
+            tick_speed=POWERUP_TICK_SPEED,
+            base_player_speed=PLAYER_SPEED,
+            boosted_player_speed=400,
+        )
 
     # ------------------------------------------------------------------
     # Helpers
@@ -783,7 +788,7 @@ class GameplayScene(BaseScene):
 
         # Ronaldinho random "ole" deflection
         if level == 3 and self.cfg["has_ole"]:
-            if random.randint(0, 200) == 1 and self.vel_x > 0:
+            if random.randint(0, 200) == RONALDINHO_OLE_CHANCE and self.vel_x > 0:
                 self.game.assets.play_sfx("paddle_sound.ogg")
                 self.vel_y *= RONALDINHO_OLE_VEL_Y_MULT
                 self.vel_x *= RONALDINHO_OLE_VEL_X_MULT
@@ -793,7 +798,7 @@ class GameplayScene(BaseScene):
             self.enemy_pad.sync_rect()
             self.ball.sync_rect()
             if (self.ball.rect.colliderect(self.enemy_pad.rect)
-                    and random.randint(0, 10) == 1):
+                    and random.randint(0, 10) == BULK_HOLD_CHANCE):
                 if not self.is_holding:
                     self.hold_timer = BULK_HOLD_TIME
                 self.is_holding = True
