@@ -27,6 +27,12 @@ from settings import (
 from entities import Paddle, AnimatedEntity, Ball, HelperPaddle, PowerUp
 from ai import EnemyAI
 from hud import HUD
+from logic.collisions import (
+    apply_enemy_momentum_deflection,
+    apply_player_momentum_deflection,
+    resolve_paddle_bounce,
+)
+from logic.helpers import patrol_vertical, track_target_center
 from logic.physics import accelerate_towards_cap, apply_speed_soft_limit, decay_momentum
 from logic.powerups import (
     resolve_powerup_collision,
@@ -402,25 +408,27 @@ class GameplayScene(BaseScene):
             assets.play_sfx("paddle_sound.ogg")
             px, py, pw, ph = (self.player_pad.x, self.player_pad.y,
                                self.player_pad.width, self.player_pad.height)
-            if abs(bx + bw - px) < 20:
-                self.vel_x *= -1
-                self.ball.x = px - bw
-            elif abs(by + bh - py) < 20 and self.vel_y > 0:
-                self.vel_y *= -1
-                self.ball.y = py - bh
-            elif abs(by - (py + ph)) < 20 and self.vel_y < 0:
-                self.vel_y *= -1
-                self.ball.y = py + ph
+            self.ball.x, self.ball.y, self.vel_x, self.vel_y = resolve_paddle_bounce(
+                ball_x=bx,
+                ball_y=by,
+                ball_w=bw,
+                ball_h=bh,
+                pad_x=px,
+                pad_y=py,
+                pad_w=pw,
+                pad_h=ph,
+                vel_x=self.vel_x,
+                vel_y=self.vel_y,
+                front_face="right",
+            )
 
             # Momentum-based deflection
-            if self.momentum_dir_player == 1 and self.vel_y > 0:
-                self.vel_x += self.momentum_enemy * 2
-                self.vel_y += self.momentum_enemy * 2
-                self.vel_y *= -1
-            if self.momentum_dir_player == -1 and self.vel_y < 0:
-                self.vel_x += self.momentum_enemy * 2
-                self.vel_y += self.momentum_enemy * 2
-                self.vel_y *= -1
+            self.vel_x, self.vel_y = apply_player_momentum_deflection(
+                vel_x=self.vel_x,
+                vel_y=self.vel_y,
+                momentum_direction=self.momentum_dir_player,
+                momentum_enemy=self.momentum_enemy,
+            )
 
             # Dash on hit
             if keys[pygame.K_SPACE] and self.dash_number_player > 0:
@@ -434,25 +442,27 @@ class GameplayScene(BaseScene):
             assets.play_sfx("paddle_sound.ogg")
             ex, ey, ew, eh = (self.enemy_pad.x, self.enemy_pad.y,
                                self.enemy_pad.width, self.enemy_pad.height)
-            if abs(bx - (ex + ew)) < 20:
-                self.vel_x *= -1
-                self.ball.x = ex + ew
-            elif abs(by + bh - ey) < 20 and self.vel_y > 0:
-                self.vel_y *= -1
-                self.ball.y = ey - bh
-            elif abs(by - (ey + eh)) < 20 and self.vel_y < 0:
-                self.vel_y *= -1
-                self.ball.y = ey + eh
+            self.ball.x, self.ball.y, self.vel_x, self.vel_y = resolve_paddle_bounce(
+                ball_x=bx,
+                ball_y=by,
+                ball_w=bw,
+                ball_h=bh,
+                pad_x=ex,
+                pad_y=ey,
+                pad_w=ew,
+                pad_h=eh,
+                vel_x=self.vel_x,
+                vel_y=self.vel_y,
+                front_face="left",
+            )
 
             # Enemy momentum-based deflection
-            if self.momentum_dir_enemy == -1 and self.vel_y > 0:
-                self.vel_x += self.momentum_enemy * 2
-                self.vel_y += self.momentum_enemy * 2
-                self.vel_y *= -1
-            if self.momentum_dir_enemy == 1 and self.vel_y < 0:
-                self.vel_x += self.momentum_enemy * 2
-                self.vel_y += self.momentum_enemy * 2
-                self.vel_y *= -1
+            self.vel_x, self.vel_y = apply_enemy_momentum_deflection(
+                vel_x=self.vel_x,
+                vel_y=self.vel_y,
+                momentum_direction=self.momentum_dir_enemy,
+                momentum_enemy=self.momentum_enemy,
+            )
 
     # ------------------------------------------------------------------
     # Player input
@@ -694,21 +704,25 @@ class GameplayScene(BaseScene):
 
             if self.vel_x < threshold:
                 # Track ball
-                mid_h = helper.y + helper.height / 2
-                mid_b = self.ball.y + self.ball.height / 2
-                if mid_h < mid_b:
-                    helper.y += track_speed * dt
-                elif mid_h > mid_b:
-                    helper.y -= track_speed * dt
+                helper.y = track_target_center(
+                    y=helper.y,
+                    height=helper.height,
+                    target_y=self.ball.y,
+                    target_height=self.ball.height,
+                    speed=track_speed,
+                    dt=dt,
+                )
             else:
                 # Patrol
-                helper.y += helper.speed * helper.patrol_direction * dt
-                if helper.y <= char_h:
-                    helper.patrol_direction = 1
-                    helper.y = char_h
-                if helper.y + helper.height >= SCREEN_HEIGHT:
-                    helper.patrol_direction = -1
-                    helper.y = SCREEN_HEIGHT - helper.height
+                helper.y, helper.patrol_direction = patrol_vertical(
+                    y=helper.y,
+                    height=helper.height,
+                    min_y=char_h,
+                    max_y=SCREEN_HEIGHT,
+                    speed=helper.speed,
+                    direction=helper.patrol_direction,
+                    dt=dt,
+                )
 
             # Helper-ball collision
             helper.sync_rect()
@@ -723,15 +737,19 @@ class GameplayScene(BaseScene):
                 hy = helper.y
                 hw = helper.width
                 hh = helper.height
-                if abs(bx - (hx + hw)) < 20:
-                    self.vel_x *= -1
-                    self.ball.x = hx + hw
-                elif abs(by + bh - hy) < 20 and self.vel_y > 0:
-                    self.vel_y *= -1
-                    self.ball.y = hy - bh
-                elif abs(by - (hy + hh)) < 20 and self.vel_y < 0:
-                    self.vel_y *= -1
-                    self.ball.y = hy + hh
+                self.ball.x, self.ball.y, self.vel_x, self.vel_y = resolve_paddle_bounce(
+                    ball_x=bx,
+                    ball_y=by,
+                    ball_w=bw,
+                    ball_h=bh,
+                    pad_x=hx,
+                    pad_y=hy,
+                    pad_w=hw,
+                    pad_h=hh,
+                    vel_x=self.vel_x,
+                    vel_y=self.vel_y,
+                    front_face="left",
+                )
 
         # Player helper (Cinos - level 2, only when power-up active)
         if self.player_helper and level == 2 and self.power_up_active:
@@ -744,20 +762,24 @@ class GameplayScene(BaseScene):
                 track_speed = self.cfg["player_helper_track_speed"]
 
                 if self.vel_x > threshold:
-                    mid_h = helper.y + helper.height / 2
-                    mid_b = self.ball.y + self.ball.height / 2
-                    if mid_h < mid_b:
-                        helper.y += track_speed * dt
-                    elif mid_h > mid_b:
-                        helper.y -= track_speed * dt
+                    helper.y = track_target_center(
+                        y=helper.y,
+                        height=helper.height,
+                        target_y=self.ball.y,
+                        target_height=self.ball.height,
+                        speed=track_speed,
+                        dt=dt,
+                    )
                 else:
-                    helper.y += helper.speed * helper.patrol_direction * dt
-                    if helper.y <= HELPER_PATROL_MIN_Y:
-                        helper.patrol_direction = 1
-                        helper.y = HELPER_PATROL_MIN_Y
-                    if helper.y + helper.height >= SCREEN_HEIGHT:
-                        helper.patrol_direction = -1
-                        helper.y = SCREEN_HEIGHT - helper.height
+                    helper.y, helper.patrol_direction = patrol_vertical(
+                        y=helper.y,
+                        height=helper.height,
+                        min_y=HELPER_PATROL_MIN_Y,
+                        max_y=SCREEN_HEIGHT,
+                        speed=helper.speed,
+                        direction=helper.patrol_direction,
+                        dt=dt,
+                    )
 
                 # Helper-ball collision
                 helper.sync_rect()
@@ -768,15 +790,19 @@ class GameplayScene(BaseScene):
                     bw, bh = self.ball.width, self.ball.height
                     hx, hy = helper.x, helper.y
                     hw, hh = helper.width, helper.height
-                    if abs(bx + bw - hx) < 20:
-                        self.vel_x *= -1
-                        self.ball.x = hx - bw
-                    elif abs(by + bh - hy) < 20 and self.vel_y > 0:
-                        self.vel_y *= -1
-                        self.ball.y = hy - bh
-                    elif abs(by - (hy + hh)) < 20 and self.vel_y < 0:
-                        self.vel_y *= -1
-                        self.ball.y = hy + hh
+                    self.ball.x, self.ball.y, self.vel_x, self.vel_y = resolve_paddle_bounce(
+                        ball_x=bx,
+                        ball_y=by,
+                        ball_w=bw,
+                        ball_h=bh,
+                        pad_x=hx,
+                        pad_y=hy,
+                        pad_w=hw,
+                        pad_h=hh,
+                        vel_x=self.vel_x,
+                        vel_y=self.vel_y,
+                        front_face="right",
+                    )
             else:
                 self.power_up_active = False
 
